@@ -16,24 +16,23 @@ export function MusicTrimMerge() {
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackTime, setPlaybackTime] = useState(0);
-  const [trimRange, setTrimRange] = useState<[number, number]>([0, 100]); // percentage [0, 100]
+  const [trimRange, setTrimRange] = useState<[number, number]>([0, 100]);
   const [isMerging, setIsMerging] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Audio nodes & contexts for custom playback
   const audioContextRef = useRef<AudioContext | null>(null);
   const sourceNodeRef = useRef<AudioBufferSourceNode | null>(null);
   const startTimeRef = useRef<number>(0);
   const startOffsetRef = useRef<number>(0);
   const rafRef = useRef<number | null>(null);
-
-  // Waveform visualization ref
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // Initialize AudioContext lazily
+  const genId = () => Math.random().toString(36).substr(2, 9);
+
   const getAudioContext = () => {
     if (!audioContextRef.current) {
-      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      audioContextRef.current = new AudioCtx();
     }
     return audioContextRef.current;
   };
@@ -88,7 +87,6 @@ export function MusicTrimMerge() {
     }
   };
 
-  // Draw simple waveform representation
   useEffect(() => {
     if (!track || !track.audioBuffer || !canvasRef.current) return;
 
@@ -102,49 +100,38 @@ export function MusicTrimMerge() {
     const height = canvas.height;
 
     ctx.clearRect(0, 0, width, height);
-
-    // Draw grid/background
     ctx.fillStyle = "rgba(0, 0, 0, 0.02)";
     ctx.fillRect(0, 0, width, height);
 
     const step = Math.ceil(leftChannel.length / width);
     const amp = height / 2;
-
-    // Drawing of peaks
     ctx.lineWidth = 1.5;
 
-    // Left and right markers
     const leftBound = (trimRange[0] / 100) * width;
     const rightBound = (trimRange[1] / 100) * width;
 
     for (let i = 0; i < width; i++) {
       let min = 1.0;
       let max = -1.0;
-
       for (let j = 0; j < step; j++) {
         const datum = leftChannel[i * step + j];
         if (datum < min) min = datum;
         if (datum > max) max = datum;
       }
-
       const isInsideTrim = i >= leftBound && i <= rightBound;
       ctx.strokeStyle = isInsideTrim ? "var(--md-sys-color-primary, #D0BCFF)" : "rgba(208, 188, 255, 0.2)";
-
       ctx.beginPath();
       ctx.moveTo(i, amp + min * amp * 0.95);
       ctx.lineTo(i, amp + max * amp * 0.95);
       ctx.stroke();
     }
 
-    // Playback head line
     if (isPlaying && track.duration) {
       const currentTrimStart = (trimRange[0] / 100) * track.duration;
       const currentTrimEnd = (trimRange[1] / 100) * track.duration;
       const trimLen = currentTrimEnd - currentTrimStart;
-      
       const playProgress = (playbackTime - currentTrimStart) / trimLen;
       const x = leftBound + playProgress * (rightBound - leftBound);
-      
       if (x >= leftBound && x <= rightBound) {
         ctx.strokeStyle = "var(--md-sys-color-error, #F2B8B5)";
         ctx.lineWidth = 2;
@@ -179,15 +166,13 @@ export function MusicTrimMerge() {
     source.connect(ctx.destination);
 
     const timeRemaining = endSec - startOffsetRef.current;
-    
-    // Play sound slice
+
     source.start(0, startOffsetRef.current, timeRemaining);
     sourceNodeRef.current = source;
     startTimeRef.current = ctx.currentTime - (startOffsetRef.current - startSec);
     setIsPlaying(true);
 
     source.onended = () => {
-      // Check if it reached the end or was stopped manually
       const currentPlayback = ctx.currentTime - startTimeRef.current + startSec;
       if (currentPlayback >= endSec - 0.05) {
         setIsPlaying(false);
@@ -197,12 +182,10 @@ export function MusicTrimMerge() {
       }
     };
 
-    // Animate playhead
     const updatePlayhead = () => {
       if (!isPlaying) return;
       const elapsed = ctx.currentTime - startTimeRef.current;
       const currentPos = startSec + elapsed;
-      
       if (currentPos <= endSec) {
         setPlaybackTime(currentPos);
         startOffsetRef.current = currentPos;
@@ -220,7 +203,7 @@ export function MusicTrimMerge() {
     if (sourceNodeRef.current) {
       try {
         sourceNodeRef.current.stop();
-      } catch (e) {}
+      } catch (e) { }
       sourceNodeRef.current = null;
     }
     if (rafRef.current) {
@@ -268,21 +251,21 @@ export function MusicTrimMerge() {
   // Extract trimmed audio from current track and add to Merge Queue
   const addToMergeQueue = () => {
     if (!track || !track.audioBuffer) return;
-    
+
     stopPlayback();
     const { start, end, length } = getTrimmedDurations();
     const ctx = getAudioContext();
-    
+
     const sampleRate = track.audioBuffer.sampleRate;
     const channels = track.audioBuffer.numberOfChannels;
-    
+
     const startSample = Math.floor(start * sampleRate);
     const endSample = Math.floor(end * sampleRate);
     const lengthSamples = endSample - startSample;
-    
+
     // Create new AudioBuffer for trimmed slice
     const trimmedBuffer = ctx.createBuffer(channels, lengthSamples, sampleRate);
-    
+
     for (let channel = 0; channel < channels; channel++) {
       const originalData = track.audioBuffer.getChannelData(channel);
       const trimmedData = trimmedBuffer.getChannelData(channel);
@@ -290,11 +273,11 @@ export function MusicTrimMerge() {
         trimmedData[i] = originalData[startSample + i];
       }
     }
-    
+
     const queueItem: AudioTrack = {
-      id: Math.random().toString(36).substr(2, 9),
+      id: genId(),
       name: `[Cắt] ${track.name.replace(/\.[^/.]+$/, "")} (${formatTime(length).replace(".", "_")})`,
-      size: 0, // Computed on export
+      size: 0,
       duration: length,
       sampleRate,
       numberOfChannels: channels,
@@ -302,7 +285,7 @@ export function MusicTrimMerge() {
       trimStart: 0,
       trimEnd: length,
     };
-    
+
     setMergeQueue([...mergeQueue, queueItem]);
     showSnackbar({
       message: "Đã thêm đoạn nhạc đã cắt!",
@@ -314,57 +297,41 @@ export function MusicTrimMerge() {
     setMergeQueue(mergeQueue.filter(item => item.id !== id));
   };
 
-  // Merge segments in queue into a single download
   const handleMergeAndExport = async () => {
     if (mergeQueue.length === 0) return;
     setIsMerging(true);
-    
-    // Delay slightly to let the browser render the spinner
     await new Promise(resolve => setTimeout(resolve, 500));
-    
     try {
       const ctx = getAudioContext();
-      
-      // Determine output characteristics from first item
       const sampleRate = mergeQueue[0].sampleRate;
       const channels = mergeQueue[0].numberOfChannels;
-      
-      // Compute total combined sample length
       let totalSamples = 0;
       for (const t of mergeQueue) {
-        if (t.audioBuffer) {
-          totalSamples += t.audioBuffer.length;
-        }
+        if (t.audioBuffer) totalSamples += t.audioBuffer.length;
       }
-      
-      // Create output audio buffer
+
       const mergedBuffer = ctx.createBuffer(channels, totalSamples, sampleRate);
-      
-      // Copy channels sequentially
+
       for (let channel = 0; channel < channels; channel++) {
         const mergedData = mergedBuffer.getChannelData(channel);
         let writeOffset = 0;
-        
         for (const segment of mergeQueue) {
           if (segment.audioBuffer) {
-            // Some tracks might have fewer channels than others, default to 0
-            const segChannelData = segment.audioBuffer.numberOfChannels > channel 
-              ? segment.audioBuffer.getChannelData(channel) 
-              : segment.audioBuffer.getChannelData(0); // fallback
-            
+            // Fall back to ch0 if this segment has fewer channels
+            const segChannelData = segment.audioBuffer.numberOfChannels > channel
+              ? segment.audioBuffer.getChannelData(channel)
+              : segment.audioBuffer.getChannelData(0);
             mergedData.set(segChannelData, writeOffset);
             writeOffset += segment.audioBuffer.length;
           }
         }
       }
-      
-      // Encode to WAV on client
+
       const wavBlob = bufferToWav(mergedBuffer);
       const url = URL.createObjectURL(wavBlob);
-      
       const link = document.createElement("a");
       link.href = url;
-      link.download = `GhepNhac_${new Date().toISOString().slice(0,10)}.wav`;
+      link.download = `GhepNhac_${new Date().toISOString().slice(0, 10)}.wav`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -377,23 +344,15 @@ export function MusicTrimMerge() {
     }
   };
 
-  // Clean up on unmount
-  useEffect(() => {
-    return () => {
-      stopPlayback();
-    };
-  }, []);
+  useEffect(() => { return () => { stopPlayback(); }; }, []);
 
-  // Clear errors when track or queue changes
-  useEffect(() => {
-    setError(null);
-  }, [track, mergeQueue]);
+  useEffect(() => { setError(null); }, [track, mergeQueue]);
 
   const { start: trimmedStart, end: trimmedEnd, length: trimmedLength } = getTrimmedDurations();
 
   return (
-    <div className="flex flex-col gap-6" id="trim-merge-tab">
-      <Card variant="elevated" className="p-5 flex flex-col gap-4">
+    <div className="flex flex-col gap-6 overflow-hidden" id="trim-merge-tab">
+      <div className="p-1 flex flex-col gap-4 overflow-hidden">
         <div className="flex items-center gap-3">
           <IconButton colorStyle="tonal" aria-label="Scissors">
             <Icon name="content_cut" className="text-m3-primary" />
@@ -440,8 +399,8 @@ export function MusicTrimMerge() {
         ) : (
           <div className="flex flex-col gap-4">
             {/* File info bar */}
-            <div className="flex items-center justify-between p-3 bg-m3-surface-container-low rounded-xl">
-              <div className="flex items-center gap-3 overflow-hidden">
+            <div className="flex items-center gap-2 p-3 bg-m3-surface-container-low rounded-xl min-w-0">
+              <div className="flex items-center gap-3 overflow-hidden min-w-0 flex-1">
                 <Icon name="audiotrack" className="text-m3-primary shrink-0" />
                 <div className="overflow-hidden">
                   <Text variant="body-md" className="font-md text-m3-on-surface truncate block">
@@ -454,6 +413,7 @@ export function MusicTrimMerge() {
               </div>
               <Button
                 colorStyle="text"
+                className="shrink-0"
                 onClick={() => {
                   stopPlayback();
                   setTrack(null);
@@ -469,7 +429,7 @@ export function MusicTrimMerge() {
                 ref={canvasRef}
                 width={600}
                 height={120}
-                className="w-full h-[120px] block"
+                className="w-full h-30 block"
               />
               <div className="absolute bottom-2 left-3 bg-black/60 text-white text-xs px-2 py-0.5 rounded-md font-mono">
                 {formatTime(playbackTime)} / {formatTime(track.duration)}
@@ -478,9 +438,9 @@ export function MusicTrimMerge() {
 
             {/* Slider Range Trimming */}
             <div className="px-2 py-1 flex flex-col gap-1">
-              <div className="flex justify-between items-center text-xs text-m3-on-surface-variant font-mono">
+              <div className="flex flex-wrap justify-between items-center gap-x-3 gap-y-1 text-xs text-m3-on-surface-variant font-mono">
                 <span>Cắt từ: {formatTime(trimmedStart)}</span>
-                <span className="font-semibold text-m3-primary">Độ dài cắt: {formatTime(trimmedLength)}</span>
+                <span className="font-semibold text-m3-primary">Độ dài: {formatTime(trimmedLength)}</span>
                 <span>Đến: {formatTime(trimmedEnd)}</span>
               </div>
               <RangeSlider
@@ -534,16 +494,16 @@ export function MusicTrimMerge() {
             <Text variant="body-sm" className="text-m3-primary">Đang tải và giải mã tệp âm thanh...</Text>
           </div>
         )}
-      </Card>
+      </div>
 
       {/* Merge Queue / Splicing Manager Card */}
-      <Card variant="outlined" className="p-5 flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+      <div className="p-5 flex flex-col gap-4 overflow-hidden border border-m3-outline-variant/30 rounded-2xl bg-transparent">
+        <div className="flex items-start justify-between gap-2 min-w-0">
+          <div className="flex items-center gap-3 overflow-hidden min-w-0 flex-1">
             <IconButton colorStyle="tonal" aria-label="Merge queue">
               <Icon name="play_arrow" className="text-m3-secondary rotate-90" />
             </IconButton>
-            <div>
+            <div className="overflow-hidden min-w-0">
               <Text variant="title-md" className="font-semibold text-m3-on-surface">Danh sách ghép nối ({mergeQueue.length})</Text>
               <Text variant="body-sm" className="text-m3-on-surface-variant">Các đoạn nhạc sẽ được nối tiếp nhau theo thứ tự dưới đây.</Text>
             </div>
@@ -552,6 +512,7 @@ export function MusicTrimMerge() {
           {mergeQueue.length > 0 && (
             <Button
               colorStyle="text"
+              className="shrink-0"
               onClick={() => setMergeQueue([])}
             >
               Xóa tất cả
@@ -559,7 +520,7 @@ export function MusicTrimMerge() {
           )}
         </div>
 
-        <Divider shape='wavy'/>
+        <Divider shape='wavy' />
 
         {mergeQueue.length === 0 ? (
           <div className="p-8 text-center text-m3-on-surface-variant/60 flex flex-col items-center justify-center gap-2">
@@ -570,7 +531,7 @@ export function MusicTrimMerge() {
         ) : (
           <div className="flex flex-col gap-3">
             {/* List segments */}
-            <div className="flex flex-col gap-2 max-h-[220px] overflow-y-auto pr-1">
+            <div className="flex flex-col gap-2 max-h-55 overflow-y-auto pr-1">
               {mergeQueue.map((item, idx) => (
                 <div
                   key={item.id}
@@ -607,7 +568,7 @@ export function MusicTrimMerge() {
                 )}</Text>
                 <Text variant="body-sm" className="text-m3-on-surface-variant">Nhạc sẽ được xuất ở dạng WAV lossless 16-bit PCM chất lượng phòng thu.</Text>
               </div>
-              
+
               <Button
                 colorStyle="filled"
                 onClick={handleMergeAndExport}
@@ -627,7 +588,7 @@ export function MusicTrimMerge() {
             <Text variant="body-sm" className="text-m3-secondary">Đang nối các kênh âm thanh và đóng gói mã hóa PCM WAV...</Text>
           </div>
         )}
-      </Card>
+      </div>
     </div>
   );
 }

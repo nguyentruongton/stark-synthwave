@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from "react";
-import { Card, Button, IconButton, Text, Divider, LoadingIndicator, Icon } from "@bug-on/md3-react";
+import { Button, IconButton, Text, Divider, LoadingIndicator, Icon } from "@bug-on/md3-react";
 import { KeyResult } from "../types";
 import { detectKey, safeDecodeAudioData } from "../utils/audioAnalysis";
 
@@ -28,14 +28,12 @@ export function ToneDetector() {
     setResult(null);
     setError(null);
     setFile(selectedFile);
-
     await new Promise(resolve => setTimeout(resolve, 500));
-
     try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const audioContext = new AudioCtx();
       const arrayBuffer = await selectedFile.arrayBuffer();
       const audioBuffer = await safeDecodeAudioData(audioContext, arrayBuffer);
-
       const keyResult = detectKey(audioBuffer);
       setResult(keyResult);
     } catch (err) {
@@ -47,7 +45,6 @@ export function ToneDetector() {
     }
   };
 
-  // Compute Camelot wheel harmonically compatible keys
   const getHarmonicMatches = (camelot: string) => {
     const matches: { key: string; relation: string }[] = [];
     const matchNum = parseInt(camelot, 10);
@@ -77,16 +74,16 @@ export function ToneDetector() {
   };
 
   return (
-    <div className="flex flex-col gap-6" id="tone-tab">
-      <Card variant="elevated" className="p-4 sm:p-5 flex flex-col gap-4">
+    <div className="flex flex-col gap-6 overflow-hidden" id="tone-tab">
+      <div className="p-1 flex flex-col gap-4 overflow-hidden">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-start sm:items-center gap-3 flex-1">
             <IconButton colorStyle="tonal" aria-label="Key" className="shrink-0">
               <Icon name="vpn_key" className="text-m3-primary" />
             </IconButton>
             <div className="min-w-0 flex-1">
-              <Text variant="title-md" className="font-semibold text-m3-on-surface break-words whitespace-normal">Dò Tone / Thang âm bài hát</Text>
-              <Text variant="body-sm" className="text-m3-on-surface-variant break-words whitespace-normal">Phân tích tần số Pitch Chroma để xác định tông chính (Key/Scale) của bản nhạc.</Text>
+              <Text variant="title-md" className="font-semibold text-m3-on-surface wrap-break-word whitespace-normal">Dò Tone / Thang âm bài hát</Text>
+              <Text variant="body-sm" className="text-m3-on-surface-variant wrap-break-word whitespace-normal">Phân tích tần số Pitch Chroma để xác định tông chính (Key/Scale) của bản nhạc.</Text>
             </div>
           </div>
 
@@ -102,12 +99,12 @@ export function ToneDetector() {
 
         {showInfo && (
           <div className="bg-m3-primary-container/20 border border-m3-primary/20 p-4 rounded-xl flex flex-col gap-2">
-            <Text variant="body-md" className="font-semibold text-m3-on-primary-container break-words whitespace-normal">Camelot System & Phối tông hòa âm là gì?</Text>
-            <Text variant="body-sm" className="text-m3-on-surface-variant break-words whitespace-normal">
+            <Text variant="body-md" className="font-semibold text-m3-on-primary-container wrap-break-word whitespace-normal">Camelot System & Phối tông hòa âm là gì?</Text>
+            <Text variant="body-sm" className="text-m3-on-surface-variant wrap-break-word whitespace-normal">
               Mã <strong>Camelot</strong> (ví dụ: 8B, 8A) là hệ thống đánh số mã hóa cho vòng tròn bậc năm (Circle of Fifths).
               Các DJ chuyên nghiệp sử dụng hệ thống này để trộn nhạc hòa âm (harmonic mixing) mượt mà mà không lo bị phô hay lệch tông.
             </Text>
-            <Text variant="body-sm" className="text-m3-on-surface-variant break-words whitespace-normal">
+            <Text variant="body-sm" className="text-m3-on-surface-variant wrap-break-word whitespace-normal">
               Các bài hát có mã kề nhau (ví dụ 8B có thể ghép hoàn hảo với 7B, 9B, hoặc 8A) sẽ có cấu trúc hòa âm tương thích và trộn lẫn với nhau tạo cảm giác tự nhiên nhất.
             </Text>
           </div>
@@ -117,7 +114,7 @@ export function ToneDetector() {
           <div className="flex items-center justify-between p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm animate-in fade-in duration-200 min-w-0 gap-2">
             <div className="flex items-center gap-2 min-w-0 flex-1">
               <Icon name="error" className="text-red-400 shrink-0" />
-              <span className="break-words whitespace-normal min-w-0 flex-1">{error}</span>
+              <span className="wrap-break-word whitespace-normal min-w-0 flex-1">{error}</span>
             </div>
             <IconButton onClick={() => setError(null)} aria-label="Close error" className="shrink-0">
               <Icon name="close" size={18} className="text-red-400" />
@@ -132,8 +129,8 @@ export function ToneDetector() {
           >
             <Icon name="music_note" size={64} className="text-m3-primary/60 shrink-0" />
             <div className="min-w-0">
-              <Text variant="body-lg" className="font-md text-m3-on-surface break-words whitespace-normal">Chọn tệp nhạc để dò tìm Thang âm</Text>
-              <Text variant="body-sm" className="text-m3-on-surface-variant break-words whitespace-normal mt-1">Thuật toán Pitch Class Profile hoạt động hoàn toàn trên client</Text>
+              <Text variant="body-lg" className="font-md text-m3-on-surface wrap-break-word whitespace-normal">Chọn tệp nhạc để dò tìm Thang âm</Text>
+              <Text variant="body-sm" className="text-m3-on-surface-variant wrap-break-word whitespace-normal mt-1">Thuật toán Pitch Class Profile hoạt động hoàn toàn trên client</Text>
             </div>
             <input
               id="tone-upload"
@@ -176,7 +173,7 @@ export function ToneDetector() {
         {isLoading && (
           <div className="flex flex-col items-center gap-3 p-6">
             <LoadingIndicator aria-label="Analyzing song key" size={40} className="shrink-0" />
-            <Text variant="body-sm" className="text-m3-primary text-center break-words whitespace-normal">Đang phân tích cấu trúc nốt nhạc và lập bản đồ Chroma...</Text>
+            <Text variant="body-sm" className="text-m3-primary text-center wrap-break-word whitespace-normal">Đang phân tích cấu trúc nốt nhạc và lập bản đồ Chroma...</Text>
           </div>
         )}
 
@@ -209,7 +206,7 @@ export function ToneDetector() {
                     <div key={match.key} className="flex items-center justify-between p-2 sm:p-2.5 bg-m3-surface-container-lowest rounded-xl border border-m3-outline-variant/50 gap-2">
                       <div className="flex items-center gap-2 min-w-0 flex-1">
                         <Icon name="arrow_forward" className="text-m3-secondary shrink-0" size={16} />
-                        <Text variant="body-md" className="text-m3-on-surface-variant text-xs font-md break-words whitespace-normal leading-tight">
+                        <Text variant="body-md" className="text-m3-on-surface-variant text-xs font-md wrap-break-word whitespace-normal leading-tight">
                           {match.relation}
                         </Text>
                       </div>
@@ -229,20 +226,20 @@ export function ToneDetector() {
             <div className="flex flex-col gap-3">
               <Text variant="title-sm" className="font-semibold text-m3-on-surface">Bản đồ phân phối năng lượng nốt nhạc (Chromagram Profiler)</Text>
 
-              <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
-                <div className="flex sm:grid sm:grid-cols-12 gap-1.5 sm:gap-2 min-w-[480px] sm:min-w-0">
+              <div className="w-full">
+                <div className="grid grid-cols-12 gap-1 sm:gap-2 w-full">
                   {result.chroma.map((energy, idx) => {
                     const isDetectedNote = result.keyName.startsWith(NOTE_LABELS[idx]);
                     return (
                       <div
                         key={NOTE_LABELS[idx]}
-                        className={`flex-1 min-w-[36px] sm:min-w-0 p-1.5 sm:p-2 rounded-xl flex flex-col items-center gap-1.5 sm:gap-2 justify-end min-h-[80px] sm:min-h-[90px] border transition-colors ${isDetectedNote
+                        className={`min-w-0 px-0.5 py-1.5 sm:p-2 rounded-lg sm:rounded-xl flex flex-col items-center gap-1 sm:gap-2 justify-end min-h-20 sm:min-h-22.5 border transition-colors ${isDetectedNote
                           ? "bg-m3-primary/10 border-m3-primary/40 text-m3-primary"
                           : "bg-m3-surface-container-low border-m3-outline-variant/40 text-m3-on-surface-variant"
                           }`}
                       >
                         {/* Height-based energy bar */}
-                        <div className="w-full bg-m3-outline-variant/20 rounded-md h-[30px] sm:h-[40px] flex items-end overflow-hidden">
+                        <div className="w-full bg-m3-outline-variant/20 rounded-md h-7.5 sm:h-10 flex items-end overflow-hidden">
                           <div
                             className={`w-full rounded-t-sm transition-all duration-500 ${isDetectedNote ? "bg-m3-primary" : "bg-m3-outline"
                               }`}
@@ -258,11 +255,11 @@ export function ToneDetector() {
                   })}
                 </div>
               </div>
-              <Text variant="body-sm" className="text-m3-on-surface-variant text-center mt-1 break-words whitespace-normal">Các nốt có mức năng lượng cao nhất quyết định cấu trúc giọng và thang âm của toàn bài hát.</Text>
+              <Text variant="body-sm" className="text-m3-on-surface-variant text-center mt-1 wrap-break-word whitespace-normal">Các nốt có mức năng lượng cao nhất quyết định cấu trúc giọng và thang âm của toàn bài hát.</Text>
             </div>
           </div>
         )}
-      </Card>
+      </div>
     </div>
   );
 }

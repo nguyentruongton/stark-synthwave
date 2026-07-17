@@ -14,7 +14,7 @@ export function LosslessChecker() {
   const [result, setResult] = useState<QualityResult | null>(null);
   const [showInfo, setShowInfo] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,15 +39,15 @@ export function LosslessChecker() {
     setResult(null);
     setError(null);
     setFile(selectedFile);
-    
-    // Tiny delay to let spinner render
+
     await new Promise(resolve => setTimeout(resolve, 500));
-    
+
     try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const audioContext = new AudioCtx();
       const arrayBuffer = await selectedFile.arrayBuffer();
       const audioBuffer = await safeDecodeAudioData(audioContext, arrayBuffer);
-      
+
       const qualityResult = analyzeLosslessQuality(audioBuffer);
       setResult(qualityResult);
     } catch (err) {
@@ -59,32 +59,28 @@ export function LosslessChecker() {
     }
   };
 
-  // Render the frequency spectrum graph
   useEffect(() => {
     if (!result || !canvasRef.current) return;
-    
+
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    
+
     const width = canvas.width;
     const height = canvas.height;
-    
+
     ctx.clearRect(0, 0, width, height);
-    
-    // Draw background grid
     ctx.fillStyle = "rgba(255, 255, 255, 0.015)";
     ctx.fillRect(0, 0, width, height);
-    
     ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
     ctx.lineWidth = 1;
-    
-    // Vertical grid lines (Frequencies: 4k, 8k, 12k, 16k, 20k)
+
+    // Vertical grid lines (4k, 8k, 12k, 16k, 20k Hz)
     const gridFreqs = [4000, 8000, 12000, 16000, 20000];
     ctx.fillStyle = "#9092A3"; // Matches on-surface-variant grey
     ctx.font = "10px monospace";
     ctx.textAlign = "center";
-    
+
     gridFreqs.forEach(f => {
       const x = (f / 22050) * width;
       ctx.beginPath();
@@ -93,8 +89,7 @@ export function LosslessChecker() {
       ctx.stroke();
       ctx.fillText(`${f / 1000}kHz`, x, height - 3);
     });
-    
-    // Horizontal grid lines (dB levels: -20, -40, -60, -80)
+
     const gridDB = [-20, -40, -60, -80];
     ctx.textAlign = "left";
     gridDB.forEach(db => {
@@ -105,19 +100,19 @@ export function LosslessChecker() {
       ctx.stroke();
       ctx.fillText(`${db}dB`, 5, y - 2);
     });
-    
-    // Plot spectrum curve
+
+    // Spectrum curve
     const points = result.spectrumData;
-    ctx.strokeStyle = result.isRealLossless 
-      ? "var(--md-sys-color-primary, #D0BCFF)" 
+    ctx.strokeStyle = result.isRealLossless
+      ? "var(--md-sys-color-primary, #D0BCFF)"
       : "var(--md-sys-color-error, #F2B8B5)";
     ctx.lineWidth = 2.5;
     ctx.beginPath();
-    
+
     points.forEach((pt, idx) => {
       const x = (pt.frequency / 22050) * width;
       const y = (pt.power / -100) * (height - 20); // invert dB to pixels
-      
+
       if (idx === 0) {
         ctx.moveTo(x, y);
       } else {
@@ -125,8 +120,8 @@ export function LosslessChecker() {
       }
     });
     ctx.stroke();
-    
-    // Fill area below spectrum curve
+
+    // Fill area under spectrum
     ctx.lineTo(width, height - 20);
     ctx.lineTo(0, height - 20);
     const gradient = ctx.createLinearGradient(0, 0, 0, height);
@@ -139,8 +134,8 @@ export function LosslessChecker() {
     }
     ctx.fillStyle = gradient;
     ctx.fill();
-    
-    // Draw cutoff line marker
+
+    // Cutoff frequency marker
     const cutoffX = (result.cutoffFrequency / 22050) * width;
     ctx.strokeStyle = "var(--md-sys-color-tertiary, #E5BAD6)";
     ctx.setLineDash([5, 4]);
@@ -149,22 +144,21 @@ export function LosslessChecker() {
     ctx.moveTo(cutoffX, 0);
     ctx.lineTo(cutoffX, height - 20);
     ctx.stroke();
-    ctx.setLineDash([]); // reset
-    
-    // Cutoff text box
+    ctx.setLineDash([]);
+
     ctx.fillStyle = "var(--md-sys-color-tertiary, #E5BAD6)";
     ctx.font = "bold 9px sans-serif";
     ctx.textAlign = cutoffX > width * 0.7 ? "right" : "left";
     const textX = cutoffX > width * 0.7 ? cutoffX - 5 : cutoffX + 5;
     ctx.fillText(`Giới hạn tần số: ${(result.cutoffFrequency / 1000).toFixed(1)}kHz`, textX, 20);
-    
+
   }, [result]);
 
   return (
-    <div className="flex flex-col gap-6" id="lossless-tab">
-      <Card variant="elevated" className="p-5 flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+    <div className="flex flex-col gap-6 overflow-hidden" id="lossless-tab">
+      <div className="p-1 flex flex-col gap-4 overflow-hidden">
+        <div className="flex items-start justify-between gap-2 min-w-0">
+          <div className="flex items-center gap-3 overflow-hidden min-w-0 flex-1">
             <IconButton colorStyle="tonal" aria-label="Shield check">
               <Icon name="verified_user" className="text-m3-primary" />
             </IconButton>
@@ -173,9 +167,9 @@ export function LosslessChecker() {
               <Text variant="body-sm" className="text-m3-on-surface-variant">Phân tích tần số để phát hiện tệp nhạc MP3 nén bị thổi phồng dung lượng thành FLAC/WAV.</Text>
             </div>
           </div>
-          
-          <IconButton 
-            colorStyle="standard" 
+
+          <IconButton
+            colorStyle="standard"
             aria-label="Help"
             onClick={() => setShowInfo(!showInfo)}
           >
@@ -187,7 +181,7 @@ export function LosslessChecker() {
           <div className="bg-m3-primary-container/20 border border-m3-primary/20 p-4 rounded-xl flex flex-col gap-2">
             <Text variant="body-md" className="font-semibold text-m3-on-primary-container">Chỉ số này hoạt động thế nào?</Text>
             <Text variant="body-sm" className="text-m3-on-surface-variant">
-              Nhạc nén (Lossy) như MP3 hay AAC thường loại bỏ triệt để các tần số cao trên <strong>15 kHz - 16 kHz</strong> để giảm kích thước tệp. 
+              Nhạc nén (Lossy) như MP3 hay AAC thường loại bỏ triệt để các tần số cao trên <strong>15 kHz - 16 kHz</strong> để giảm kích thước tệp.
               Khi một tệp MP3 được chuyển đổi giả tạo thành WAV hoặc FLAC ("upscaled/fake lossless"), biểu đồ tần số vẫn sẽ bị giới hạn nghiêm ngặt ở mốc này.
             </Text>
             <Text variant="body-sm" className="text-m3-on-surface-variant">
@@ -208,7 +202,6 @@ export function LosslessChecker() {
           </div>
         )}
 
-        {/* Upload element */}
         {!file ? (
           <div
             onDragOver={handleDragOver}
@@ -232,8 +225,8 @@ export function LosslessChecker() {
         ) : (
           <div className="flex flex-col gap-4">
             {/* File info bar */}
-            <div className="flex items-center justify-between p-3 bg-m3-surface-container-low rounded-xl">
-              <div className="flex items-center gap-3 overflow-hidden">
+            <div className="flex items-center gap-2 p-3 bg-m3-surface-container-low rounded-xl min-w-0">
+              <div className="flex items-center gap-3 overflow-hidden min-w-0 flex-1">
                 <Icon name="analytics" className="text-m3-primary shrink-0" />
                 <div className="overflow-hidden">
                   <Text variant="body-md" className="font-md text-m3-on-surface truncate block">
@@ -246,6 +239,7 @@ export function LosslessChecker() {
               </div>
               <Button
                 colorStyle="text"
+                className="shrink-0"
                 onClick={() => {
                   setFile(null);
                   setResult(null);
@@ -269,17 +263,15 @@ export function LosslessChecker() {
         {result && (
           <div className="flex flex-col gap-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
             {/* Verification Result Banner */}
-            <div className={`p-5 rounded-2xl border flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between ${
-              result.isRealLossless 
-                ? "bg-green-500/10 border-green-500/20 text-green-200" 
-                : result.score > 60
-                  ? "bg-amber-500/10 border-amber-500/20 text-amber-200"
-                  : "bg-red-500/10 border-red-500/20 text-red-200"
-            }`}>
+            <div className={`p-5 rounded-2xl border flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between ${result.isRealLossless
+              ? "bg-green-500/10 border-green-500/20 text-green-200"
+              : result.score > 60
+                ? "bg-amber-500/10 border-amber-500/20 text-amber-200"
+                : "bg-red-500/10 border-red-500/20 text-red-200"
+              }`}>
               <div className="flex gap-4 items-start sm:items-center">
-                <div className={`p-3 rounded-full shrink-0 ${
-                  result.isRealLossless ? "bg-green-500/20 text-green-400" : result.score > 60 ? "bg-amber-500/20 text-amber-400" : "bg-red-500/20 text-red-400"
-                }`}>
+                <div className={`p-3 rounded-full shrink-0 ${result.isRealLossless ? "bg-green-500/20 text-green-400" : result.score > 60 ? "bg-amber-500/20 text-amber-400" : "bg-red-500/20 text-red-400"
+                  }`}>
                   {result.isRealLossless ? (
                     <Icon name="verified_user" size={32} />
                   ) : result.score > 60 ? (
@@ -288,7 +280,7 @@ export function LosslessChecker() {
                     <Icon name="gpp_bad" size={32} />
                   )}
                 </div>
-                
+
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <Text variant="title-lg" className="font-bold text-m3-on-surface">
@@ -301,8 +293,8 @@ export function LosslessChecker() {
                     </Badge>
                   </div>
                   <Text variant="body-md" className="text-m3-on-surface-variant mt-1">
-                    {result.isRealLossless 
-                      ? "Phổ âm thanh trải rộng liên tục lên trên 20 kHz. Tệp này nguyên gốc phòng thu đạt chuẩn CD chất lượng tốt." 
+                    {result.isRealLossless
+                      ? "Phổ âm thanh trải rộng liên tục lên trên 20 kHz. Tệp này nguyên gốc phòng thu đạt chuẩn CD chất lượng tốt."
                       : result.score > 60
                         ? "Dải cao bị suy hao hoặc có hiện tượng chặn nhẹ ở 18-19 kHz. Đây có thể là nhạc 320kbps upscaled lên."
                         : "Tần số cao bị cắt phăng đột ngột ở ngưỡng dưới 16 kHz. Đây chắc chắn là tệp MP3 chất lượng thấp bị giả mạo FLAC/WAV."}
@@ -341,10 +333,10 @@ export function LosslessChecker() {
                   ref={canvasRef}
                   width={600}
                   height={220}
-                  className="w-full h-[220px] block"
+                  className="w-full h-55 block"
                 />
               </div>
-              <div className="flex justify-between items-center text-xs text-m3-on-surface-variant px-1 font-mono">
+              <div className="flex flex-wrap justify-between items-center text-xs text-m3-on-surface-variant px-1 font-mono gap-y-1">
                 <span>0 Hz (Siêu Trầm)</span>
                 <span>Tần số kiểm tra</span>
                 <span>22050 Hz (Nyquist Limit)</span>
@@ -359,16 +351,16 @@ export function LosslessChecker() {
               <div>
                 <Text variant="title-sm" className="font-semibold text-m3-on-surface">Nhận định kỹ thuật viên</Text>
                 <Text variant="body-sm" className="text-m3-on-surface-variant mt-1 leading-relaxed">
-                  Đoạn âm thanh thử nghiệm cho thấy biên độ dải cao ({result.avgPowerHigh} dB) lệch so với dải trung ({result.avgPowerMid} dB) là {Math.abs(result.avgPowerMid - result.avgPowerHigh)} dB. 
-                  {result.isRealLossless 
-                    ? " Mức chênh lệch này hoàn toàn nằm trong tiêu chuẩn tuyến tính tự nhiên của tệp nén không hao hụt (Lossless gốc)." 
+                  Đoạn âm thanh thử nghiệm cho thấy biên độ dải cao ({result.avgPowerHigh} dB) lệch so với dải trung ({result.avgPowerMid} dB) là {Math.abs(result.avgPowerMid - result.avgPowerHigh)} dB.
+                  {result.isRealLossless
+                    ? " Mức chênh lệch này hoàn toàn nằm trong tiêu chuẩn tuyến tính tự nhiên của tệp nén không hao hụt (Lossless gốc)."
                     : " Sự suy hao đột ngột ở ngưỡng tần số này chỉ ra rằng tệp đã đi qua bộ nén khử dữ liệu (lossy encoder) trước khi được đóng gói lại."}
                 </Text>
               </div>
             </div>
           </div>
         )}
-      </Card>
+      </div>
     </div>
   );
 }

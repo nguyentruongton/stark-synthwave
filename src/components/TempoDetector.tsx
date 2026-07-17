@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect, useRef } from "react";
-import { Card, Button, IconButton, Text, Divider, LoadingIndicator, Badge, Icon } from "@bug-on/md3-react";
+import { Button, IconButton, Text, LoadingIndicator, Badge, Icon } from "@bug-on/md3-react";
 import { BPMResult } from "../types";
 import { detectBPM, safeDecodeAudioData } from "../utils/audioAnalysis";
 
@@ -13,11 +13,11 @@ export function TempoDetector() {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<BPMResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Tap Tempo state
   const [tapTimes, setTapTimes] = useState<number[]>([]);
   const [tapBPM, setTapBPM] = useState<number | null>(null);
-  
+
   // Animated pulse rate
   const [pulseActive, setPulseActive] = useState(false);
   const pulseIntervalRef = useRef<number | null>(null);
@@ -33,14 +33,12 @@ export function TempoDetector() {
     setResult(null);
     setError(null);
     setFile(selectedFile);
-    
     await new Promise(resolve => setTimeout(resolve, 500));
-    
     try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const audioContext = new AudioCtx();
       const arrayBuffer = await selectedFile.arrayBuffer();
       const audioBuffer = await safeDecodeAudioData(audioContext, arrayBuffer);
-      
       const bpmResult = detectBPM(audioBuffer);
       setResult(bpmResult);
     } catch (err) {
@@ -52,51 +50,32 @@ export function TempoDetector() {
     }
   };
 
-  // Setup pulsing animation depending on active BPM
   const activeBPM = result?.bpm || tapBPM || null;
-  
+
   useEffect(() => {
-    if (pulseIntervalRef.current) {
-      clearInterval(pulseIntervalRef.current);
-      pulseIntervalRef.current = null;
-    }
-    
+    if (pulseIntervalRef.current) { clearInterval(pulseIntervalRef.current); pulseIntervalRef.current = null; }
     if (!activeBPM) return;
-    
     const intervalMs = (60 / activeBPM) * 1000;
-    
     pulseIntervalRef.current = window.setInterval(() => {
       setPulseActive(true);
       setTimeout(() => setPulseActive(false), 150);
     }, intervalMs);
-    
-    return () => {
-      if (pulseIntervalRef.current) clearInterval(pulseIntervalRef.current);
-    };
+    return () => { if (pulseIntervalRef.current) clearInterval(pulseIntervalRef.current); };
   }, [activeBPM]);
 
-  // Tap Tempo Logic
   const handleTap = () => {
     const now = performance.now();
-    const newTapTimes = [...tapTimes, now].slice(-12); // Keep last 12 taps for dynamic average
+    const newTapTimes = [...tapTimes, now].slice(-12);
     setTapTimes(newTapTimes);
-    
     if (newTapTimes.length > 1) {
       const intervals: number[] = [];
       for (let i = 1; i < newTapTimes.length; i++) {
         intervals.push(newTapTimes[i] - newTapTimes[i - 1]);
       }
-      
-      // Calculate average interval in milliseconds
       const averageInterval = intervals.reduce((acc, curr) => acc + curr, 0) / intervals.length;
       const bpm = Math.round(60000 / averageInterval);
-      
-      if (bpm >= 40 && bpm <= 240) {
-        setTapBPM(bpm);
-      }
+      if (bpm >= 40 && bpm <= 240) setTapBPM(bpm);
     }
-    
-    // Trigger momentary single tap flash
     setPulseActive(true);
     setTimeout(() => setPulseActive(false), 100);
   };
@@ -107,10 +86,10 @@ export function TempoDetector() {
   };
 
   return (
-    <div className="flex flex-col gap-6" id="tempo-tab">
+    <div className="flex flex-col gap-6 overflow-hidden" id="tempo-tab">
       {/* Auto Beat Finder Card */}
-      <Card variant="elevated" className="p-5 flex flex-col gap-4">
-        <div className="flex items-center gap-3">
+      <div className="p-1 flex flex-col gap-4 overflow-hidden">
+        <div className="flex items-start gap-3 min-w-0">
           <IconButton colorStyle="tonal" aria-label="Timer">
             <Icon name="timer" className="text-m3-primary" />
           </IconButton>
@@ -153,8 +132,8 @@ export function TempoDetector() {
         ) : (
           <div className="flex flex-col gap-4">
             {/* File info bar */}
-            <div className="flex items-center justify-between p-3 bg-m3-surface-container-low rounded-xl">
-              <div className="flex items-center gap-3 overflow-hidden">
+            <div className="flex items-center gap-2 p-3 bg-m3-surface-container-low rounded-xl min-w-0">
+              <div className="flex items-center gap-3 overflow-hidden min-w-0 flex-1">
                 <Icon name="album" className={`text-m3-primary shrink-0 ${isLoading ? "animate-spin" : ""}`} />
                 <div className="overflow-hidden">
                   <Text variant="body-md" className="font-md text-m3-on-surface truncate block">
@@ -167,6 +146,7 @@ export function TempoDetector() {
               </div>
               <Button
                 colorStyle="text"
+                className="shrink-0"
                 onClick={() => {
                   setFile(null);
                   setResult(null);
@@ -208,20 +188,19 @@ export function TempoDetector() {
 
             {/* Pulsing indicator to preview BPM speed */}
             <div className="flex flex-col items-center gap-2 mt-2">
-              <div className={`w-16 h-16 rounded-full border-4 border-m3-primary/20 flex items-center justify-center transition-all duration-100 ${
-                pulseActive ? "scale-125 bg-m3-primary/20 border-m3-primary/60" : "scale-100 bg-transparent"
-              }`}>
+              <div className={`w-16 h-16 rounded-full border-4 border-m3-primary/20 flex items-center justify-center transition-all duration-100 ${pulseActive ? "scale-125 bg-m3-primary/20 border-m3-primary/60" : "scale-100 bg-transparent"
+                }`}>
                 <Icon name="favorite" fill={pulseActive ? 1 : 0} size={28} className="text-m3-primary" />
               </div>
               <Text variant="body-sm" className="text-m3-on-surface-variant text-center font-mono">Nhịp tim đập theo nhịp điệu của bài hát</Text>
             </div>
           </div>
         )}
-      </Card>
+      </div>
 
       {/* Manual Tap Tempo Card */}
-      <Card variant="outlined" className="p-5 flex flex-col gap-4">
-        <div className="flex items-center gap-3">
+      <div className="p-5 flex flex-col gap-4 overflow-hidden border border-m3-outline-variant/30 rounded-2xl bg-transparent">
+        <div className="flex items-start gap-3 min-w-0">
           <IconButton colorStyle="tonal" aria-label="Manual tap">
             <Icon name="play_arrow" className="text-m3-secondary rotate-90" />
           </IconButton>
@@ -254,11 +233,10 @@ export function TempoDetector() {
           {/* Big Tap Button */}
           <button
             onClick={handleTap}
-            className={`w-full max-w-[280px] h-[140px] rounded-3xl border-2 border-m3-secondary/30 flex flex-col items-center justify-center gap-2 cursor-pointer outline-none select-none active:scale-95 transition-all duration-100 ${
-              pulseActive && tapBPM 
-                ? "bg-m3-secondary/20 border-m3-secondary shadow-md" 
+            className={`w-full max-w-70 h-35 rounded-3xl border-2 border-m3-secondary/30 flex flex-col items-center justify-center gap-2 cursor-pointer outline-none select-none active:scale-95 transition-all duration-100 ${pulseActive && tapBPM
+                ? "bg-m3-secondary/20 border-m3-secondary shadow-md"
                 : "bg-m3-surface-container-low hover:bg-m3-surface-container-high"
-            }`}
+              }`}
           >
             <Icon name="album" size={40} className={`text-m3-secondary transition-transform duration-100 ${pulseActive && tapBPM ? "rotate-45" : ""}`} />
             <Text variant="title-md" className="font-bold text-m3-on-surface">ĐỆM NHỊP VÀO ĐÂY</Text>
@@ -276,7 +254,7 @@ export function TempoDetector() {
             </Button>
           )}
         </div>
-      </Card>
+      </div>
     </div>
   );
 }
