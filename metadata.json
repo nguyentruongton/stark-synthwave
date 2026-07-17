@@ -1,0 +1,6 @@
+{
+  "name": "Công Cụ Xử Lý Nhạc",
+  "description": "Cắt ghép nhạc, kiểm tra chất lượng lossless thật/giả, đo tempo BPM và dò tone thang âm bài hát hoàn toàn trên client.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
