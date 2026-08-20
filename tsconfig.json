@@ -18,6 +18,9 @@
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "@bug-on/md3-react": [
+        "./src/components/md3/index.tsx"
       ]
     },
     "allowImportingTsExtensions": true,

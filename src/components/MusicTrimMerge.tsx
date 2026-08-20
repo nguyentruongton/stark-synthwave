@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useRef, useEffect } from "react";
-import { Button, Card, RangeSlider, IconButton, Text, Divider, LoadingIndicator, Icon, useSnackbar } from "@bug-on/md3-react";
+import { Button, Card, RangeSlider, IconButton, Text, Divider, LoadingIndicator, Icon, useSnackbar } from "@bug-on/m3-expressive";
 import { AudioTrack } from "../types";
 import { bufferToWav } from "../utils/wavEncoder";
 import { safeDecodeAudioData } from "../utils/audioAnalysis";

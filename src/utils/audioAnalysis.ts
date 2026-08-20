@@ -5,24 +5,43 @@
 
 import { BPMResult, KeyResult, QualityResult } from "../types";
 
-/** Decodes audio safely, falling back from promise to callback API for legacy browsers. */
+/** Decodes audio safely without detaching the source buffer or triggering duplicate decode calls. */
 export async function safeDecodeAudioData(audioContext: AudioContext, arrayBuffer: ArrayBuffer): Promise<AudioBuffer> {
-  try {
-    const promise = audioContext.decodeAudioData(arrayBuffer);
-    if (promise && typeof promise.then === "function") return await promise;
-  } catch {
-    // fall through to callback-based API
+  if (audioContext.state === "suspended") {
+    try {
+      await audioContext.resume();
+    } catch {
+      // Ignore resume errors
+    }
   }
 
+  // Clone buffer so the source ArrayBuffer is never neutered/detached unexpectedly
+  const bufferCopy = arrayBuffer.slice(0);
+
   return new Promise<AudioBuffer>((resolve, reject) => {
+    let settled = false;
+
+    const onSuccess = (buffer: AudioBuffer) => {
+      if (!settled) {
+        settled = true;
+        resolve(buffer);
+      }
+    };
+
+    const onError = (err: any) => {
+      if (!settled) {
+        settled = true;
+        reject(err instanceof Error ? err : new Error(typeof err === "string" ? err : "Không thể giải mã dữ liệu âm thanh"));
+      }
+    };
+
     try {
-      audioContext.decodeAudioData(
-        arrayBuffer,
-        (buffer) => resolve(buffer),
-        (err) => reject(err || new Error("Không thể giải mã dữ liệu âm thanh"))
-      );
+      const promise = audioContext.decodeAudioData(bufferCopy, onSuccess, onError);
+      if (promise && typeof promise.then === "function") {
+        promise.then(onSuccess).catch(onError);
+      }
     } catch (err) {
-      reject(err);
+      onError(err);
     }
   });
 }

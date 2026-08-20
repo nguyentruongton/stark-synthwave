@@ -11,9 +11,10 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@bug-on/md3-react": "^4.1.0",
-    "@bug-on/md3-tailwind": "^3.0.7",
-    "@bug-on/md3-tokens": "^3.0.6",
+    "@bug-on/m3-expressive": "^1.3.2",
+    "@bug-on/m3-fonts": "^1.1.2",
+    "@bug-on/m3-tailwind": "^1.2.2",
+    "@bug-on/m3-tokens": "^1.2.2",
     "motion": "^12.23.24",
     "react": "^19.0.1",
     "react-dom": "^19.0.1"

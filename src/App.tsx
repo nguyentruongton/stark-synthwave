@@ -12,7 +12,7 @@ import {
   NavigationRail,
   NavigationRailItem,
   Icon,
-} from "@bug-on/md3-react";
+} from "@bug-on/m3-expressive";
 import { AnimatePresence, motion } from "motion/react";
 
 import { MusicTrimMerge } from "./components/MusicTrimMerge";

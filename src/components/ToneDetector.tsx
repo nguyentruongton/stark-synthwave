@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from "react";
-import { Button, IconButton, Text, Divider, LoadingIndicator, Icon } from "@bug-on/md3-react";
+import { Button, IconButton, Text, Divider, LoadingIndicator, Icon } from "@bug-on/m3-expressive";
 import { KeyResult } from "../types";
 import { detectKey, safeDecodeAudioData } from "../utils/audioAnalysis";
 
@@ -29,9 +29,10 @@ export function ToneDetector() {
     setError(null);
     setFile(selectedFile);
     await new Promise(resolve => setTimeout(resolve, 500));
+    let audioContext: AudioContext | null = null;
     try {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-      const audioContext = new AudioCtx();
+      audioContext = new AudioCtx();
       const arrayBuffer = await selectedFile.arrayBuffer();
       const audioBuffer = await safeDecodeAudioData(audioContext, arrayBuffer);
       const keyResult = detectKey(audioBuffer);
@@ -41,6 +42,9 @@ export function ToneDetector() {
       setError("Đã xảy ra lỗi khi phân tích tone bài hát. Hãy chắc chắn rằng tệp âm thanh hợp lệ và trình duyệt hỗ trợ định dạng này.");
       setFile(null);
     } finally {
+      if (audioContext && audioContext.state !== "closed") {
+        audioContext.close().catch(() => {});
+      }
       setIsLoading(false);
     }
   };

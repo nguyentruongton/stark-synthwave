@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
 @import "tailwindcss";
-@import "@bug-on/md3-react/index.css";
+@import "@bug-on/m3-expressive/index.css";
 
 /* === Global overflow prevention === */
 *,

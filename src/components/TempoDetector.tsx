@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect, useRef } from "react";
-import { Button, IconButton, Text, LoadingIndicator, Badge, Icon } from "@bug-on/md3-react";
+import { Button, IconButton, Text, LoadingIndicator, Badge, Icon } from "@bug-on/m3-expressive";
 import { BPMResult } from "../types";
 import { detectBPM, safeDecodeAudioData } from "../utils/audioAnalysis";
 
@@ -34,9 +34,10 @@ export function TempoDetector() {
     setError(null);
     setFile(selectedFile);
     await new Promise(resolve => setTimeout(resolve, 500));
+    let audioContext: AudioContext | null = null;
     try {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-      const audioContext = new AudioCtx();
+      audioContext = new AudioCtx();
       const arrayBuffer = await selectedFile.arrayBuffer();
       const audioBuffer = await safeDecodeAudioData(audioContext, arrayBuffer);
       const bpmResult = detectBPM(audioBuffer);
@@ -46,6 +47,9 @@ export function TempoDetector() {
       setError("Đã xảy ra lỗi khi phân tích tempo của bài hát này. Hãy chắc chắn rằng tệp âm thanh hợp lệ và trình duyệt hỗ trợ định dạng này.");
       setFile(null);
     } finally {
+      if (audioContext && audioContext.state !== "closed") {
+        audioContext.close().catch(() => {});
+      }
       setIsLoading(false);
     }
   };

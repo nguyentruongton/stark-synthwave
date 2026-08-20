@@ -14,9 +14,6 @@ export default defineConfig(() => {
     },
     optimizeDeps: {
       include: [
-        '@bug-on/md3-react',
-        '@bug-on/md3-tokens',
-        '@bug-on/md3-tailwind',
         'react',
         'react-dom',
         'react/jsx-runtime',
