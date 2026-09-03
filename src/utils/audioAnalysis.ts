@@ -4,9 +4,20 @@
  */
 
 import { BPMResult, KeyResult, QualityResult } from "../types";
+import {
+  stripId3Tag,
+  parseWavToAudioBuffer,
+  parseAiffToAudioBuffer,
+  parseAuToAudioBuffer,
+  detectAudioFormat,
+} from "./audioFormats";
 
-/** Decodes audio safely without detaching the source buffer or triggering duplicate decode calls. */
-export async function safeDecodeAudioData(audioContext: AudioContext, arrayBuffer: ArrayBuffer): Promise<AudioBuffer> {
+/** Decodes audio safely with multi-format fallbacks (ID3 strip, manual WAV 8/16/24/32-bit PCM/Float, AIFF, AU/SND). */
+export async function safeDecodeAudioData(
+  audioContext: AudioContext,
+  arrayBuffer: ArrayBuffer,
+  fileName: string = "audio"
+): Promise<AudioBuffer> {
   if (audioContext.state === "suspended") {
     try {
       await audioContext.resume();
@@ -15,35 +26,100 @@ export async function safeDecodeAudioData(audioContext: AudioContext, arrayBuffe
     }
   }
 
-  // Clone buffer so the source ArrayBuffer is never neutered/detached unexpectedly
-  const bufferCopy = arrayBuffer.slice(0);
-
-  return new Promise<AudioBuffer>((resolve, reject) => {
-    let settled = false;
-
-    const onSuccess = (buffer: AudioBuffer) => {
-      if (!settled) {
-        settled = true;
-        resolve(buffer);
+  // Attempt 1: Standard browser decodeAudioData
+  try {
+    const bufferCopy = arrayBuffer.slice(0);
+    const audioBuffer = await new Promise<AudioBuffer>((resolve, reject) => {
+      let settled = false;
+      const onSuccess = (buf: AudioBuffer) => {
+        if (!settled) {
+          settled = true;
+          resolve(buf);
+        }
+      };
+      const onError = (err: any) => {
+        if (!settled) {
+          settled = true;
+          reject(err);
+        }
+      };
+      try {
+        const promise = audioContext.decodeAudioData(bufferCopy, onSuccess, onError);
+        if (promise && typeof promise.then === "function") {
+          promise.then(onSuccess).catch(onError);
+        }
+      } catch (e) {
+        onError(e);
       }
-    };
+    });
+    return audioBuffer;
+  } catch (nativeErr) {
+    console.warn("Native decodeAudioData failed, attempting fallback decoders...", nativeErr);
+  }
 
-    const onError = (err: any) => {
-      if (!settled) {
-        settled = true;
-        reject(err instanceof Error ? err : new Error(typeof err === "string" ? err : "Không thể giải mã dữ liệu âm thanh"));
-      }
-    };
-
+  // Attempt 2: Strip prepended ID3v2 tag and retry native decode
+  const strippedBuffer = stripId3Tag(arrayBuffer);
+  if (strippedBuffer) {
     try {
-      const promise = audioContext.decodeAudioData(bufferCopy, onSuccess, onError);
-      if (promise && typeof promise.then === "function") {
-        promise.then(onSuccess).catch(onError);
-      }
-    } catch (err) {
-      onError(err);
+      const audioBuffer = await new Promise<AudioBuffer>((resolve, reject) => {
+        let settled = false;
+        const onSuccess = (buf: AudioBuffer) => {
+          if (!settled) {
+            settled = true;
+            resolve(buf);
+          }
+        };
+        const onError = (err: any) => {
+          if (!settled) {
+            settled = true;
+            reject(err);
+          }
+        };
+        try {
+          const promise = audioContext.decodeAudioData(strippedBuffer.slice(0), onSuccess, onError);
+          if (promise && typeof promise.then === "function") {
+            promise.then(onSuccess).catch(onError);
+          }
+        } catch (e) {
+          onError(e);
+        }
+      });
+      return audioBuffer;
+    } catch {
+      // Continue to next fallback
     }
-  });
+  }
+
+  // Attempt 3: Pure TypeScript RIFF WAV parser (8/16/24/32-bit PCM and 32-bit Float)
+  const wavBuffer = parseWavToAudioBuffer(audioContext, arrayBuffer);
+  if (wavBuffer) {
+    return wavBuffer;
+  }
+
+  // Attempt 4: Pure TypeScript AIFF/AIF big-endian PCM parser
+  const aiffBuffer = parseAiffToAudioBuffer(audioContext, arrayBuffer);
+  if (aiffBuffer) {
+    return aiffBuffer;
+  }
+
+  // Attempt 5: Sun/NeXT AU (.snd) parser
+  const auBuffer = parseAuToAudioBuffer(audioContext, arrayBuffer);
+  if (auBuffer) {
+    return auBuffer;
+  }
+
+  // Attempt 6: If strippedBuffer exists, also try WAV/AIFF parser on stripped buffer
+  if (strippedBuffer) {
+    const strippedWav = parseWavToAudioBuffer(audioContext, strippedBuffer);
+    if (strippedWav) return strippedWav;
+    const strippedAiff = parseAiffToAudioBuffer(audioContext, strippedBuffer);
+    if (strippedAiff) return strippedAiff;
+  }
+
+  const format = detectAudioFormat(arrayBuffer, fileName);
+  throw new Error(
+    `Không thể giải mã tệp định dạng [${format.name}]. Vui lòng đảm bảo tệp âm thanh không bị hỏng và không bị khóa bản quyền DRM.`
+  );
 }
 
 // --- 1. TEMPO / BPM DETECTOR (Onset Peak Clustering) ---

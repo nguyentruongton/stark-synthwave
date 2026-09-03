@@ -11,13 +11,16 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@bug-on/m3-expressive": "^1.3.2",
+    "@breezystack/lamejs": "^1.2.7",
+    "@bug-on/m3-expressive": "^1.3.3",
     "@bug-on/m3-fonts": "^1.1.2",
     "@bug-on/m3-tailwind": "^1.2.2",
     "@bug-on/m3-tokens": "^1.2.2",
     "motion": "^12.23.24",
+    "mp3tag.js": "^3.17.0",
     "react": "^19.0.1",
-    "react-dom": "^19.0.1"
+    "react-dom": "^19.0.1",
+    "react-router-dom": "^7.18.3"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.14",

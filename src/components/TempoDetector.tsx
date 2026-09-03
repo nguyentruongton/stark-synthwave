@@ -4,12 +4,24 @@
  */
 
 import React, { useState, useEffect, useRef } from "react";
-import { Button, IconButton, Text, LoadingIndicator, Badge, Icon } from "@bug-on/m3-expressive";
-import { BPMResult } from "../types";
+import {
+  Card,
+  Button,
+  IconButton,
+  Text,
+  Divider,
+  LoadingIndicator,
+  Icon,
+} from "@bug-on/m3-expressive";
+import { AudioFormatInfo, BPMResult } from "../types";
 import { detectBPM, safeDecodeAudioData } from "../utils/audioAnalysis";
+import { AUDIO_ACCEPT_STRING, detectAudioFormat, GLOBAL_AUDIO_FORMATS } from "../utils/audioFormats";
+import { useLanguage } from "../i18n/LanguageContext";
 
 export function TempoDetector() {
+  const { t, language } = useLanguage();
   const [file, setFile] = useState<File | null>(null);
+  const [detectedFormat, setDetectedFormat] = useState<AudioFormatInfo | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<BPMResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -28,24 +40,44 @@ export function TempoDetector() {
     await processAndDetectBPM(file);
   };
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    const droppedFile = e.dataTransfer.files?.[0];
+    if (!droppedFile) return;
+    await processAndDetectBPM(droppedFile);
+  };
+
   const processAndDetectBPM = async (selectedFile: File) => {
     setIsLoading(true);
     setResult(null);
     setError(null);
     setFile(selectedFile);
-    await new Promise(resolve => setTimeout(resolve, 500));
+
     let audioContext: AudioContext | null = null;
     try {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
       audioContext = new AudioCtx();
       const arrayBuffer = await selectedFile.arrayBuffer();
-      const audioBuffer = await safeDecodeAudioData(audioContext, arrayBuffer);
+      const fmt = detectAudioFormat(arrayBuffer, selectedFile.name);
+      setDetectedFormat(fmt);
+
+      const audioBuffer = await safeDecodeAudioData(audioContext, arrayBuffer, selectedFile.name);
       const bpmResult = detectBPM(audioBuffer);
       setResult(bpmResult);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Lỗi đo tempo bài hát:", err);
-      setError("Đã xảy ra lỗi khi phân tích tempo của bài hát này. Hãy chắc chắn rằng tệp âm thanh hợp lệ và trình duyệt hỗ trợ định dạng này.");
+      setError(
+        err?.message ||
+        (language === "vi"
+          ? "Đã xảy ra lỗi khi phân tích tempo của bài hát này. Hãy chắc chắn rằng tệp âm thanh hợp lệ."
+          : "Failed to analyze BPM for this audio file.")
+      );
       setFile(null);
+      setDetectedFormat(null);
     } finally {
       if (audioContext && audioContext.state !== "closed") {
         audioContext.close().catch(() => {});
@@ -92,173 +124,253 @@ export function TempoDetector() {
   return (
     <div className="flex flex-col gap-6 overflow-hidden" id="tempo-tab">
       {/* Auto Beat Finder Card */}
-      <div className="p-1 flex flex-col gap-4 overflow-hidden">
+      <Card variant="outlined" className="p-4 sm:p-6 flex flex-col gap-5 overflow-hidden bg-m3-surface-container-lowest/40 rounded-2xl border-m3-outline-variant/40">
         <div className="flex items-start gap-3 min-w-0">
           <IconButton colorStyle="tonal" aria-label="Timer">
             <Icon name="timer" className="text-m3-primary" />
           </IconButton>
           <div>
-            <Text variant="title-md" className="font-semibold text-m3-on-surface">Đo Tempo bài hát (Tự động)</Text>
-            <Text variant="body-sm" className="text-m3-on-surface-variant">Tải tệp âm thanh lên để thuật toán đếm nhịp bass tự động đo chỉ số BPM (Tempo).</Text>
+            <Text variant="title-md" className="font-semibold text-m3-on-surface">{t("tempo_title")}</Text>
+            <Text variant="body-sm" className="text-m3-on-surface-variant">{t("tempo_desc")}</Text>
           </div>
         </div>
 
         {error && (
-          <div className="flex items-center justify-between p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm animate-in fade-in duration-200">
-            <div className="flex items-center gap-2">
-              <Icon name="error" className="text-red-400 shrink-0" />
-              <span>{error}</span>
+          <Card variant="filled" className="flex items-center justify-between p-4 bg-m3-error-container text-m3-on-error-container border border-m3-error/30 rounded-xl animate-in fade-in duration-200">
+            <div className="flex items-center gap-2.5">
+              <Icon name="error" className="text-m3-error shrink-0" />
+              <Text variant="body-sm" className="text-m3-on-error-container font-medium">{error}</Text>
             </div>
-            <IconButton onClick={() => setError(null)} aria-label="Close error">
-              <Icon name="close" size={18} className="text-red-400" />
+            <IconButton colorStyle="standard" onClick={() => setError(null)} aria-label="Close error">
+              <Icon name="close" size={18} className="text-m3-on-error-container" />
             </IconButton>
-          </div>
+          </Card>
         )}
 
         {!file ? (
           <div
-            className="border-2 border-dashed border-m3-outline-variant rounded-2xl p-10 flex flex-col items-center justify-center gap-4 cursor-pointer hover:bg-m3-surface-container-low transition-colors text-center"
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+            className="border-2 border-dashed border-m3-outline-variant/60 rounded-2xl p-8 sm:p-10 flex flex-col items-center justify-center gap-4 cursor-pointer hover:bg-m3-surface-container-low transition-colors text-center bg-m3-surface-container-lowest/40"
             onClick={() => document.getElementById("tempo-upload")?.click()}
           >
-            <Icon name="music_note" size={64} className="text-m3-primary/60" />
-            <div>
-              <Text variant="body-lg" className="font-md text-m3-on-surface">Chọn tệp bài hát để bắt đầu đo</Text>
-              <Text variant="body-sm" className="text-m3-on-surface-variant">Hỗ trợ các định dạng MP3, WAV, FLAC, M4A...</Text>
+            <div className="w-16 h-16 rounded-full bg-m3-primary-container/40 flex items-center justify-center text-m3-primary">
+              <Icon name="music_note" size={36} />
             </div>
+            <div className="flex flex-col gap-1 max-w-lg">
+              <Text variant="title-md" className="font-semibold text-m3-on-surface">{t("tempo_drop_title")}</Text>
+              <Text variant="body-sm" className="text-m3-on-surface-variant">{t("tempo_drop_desc")}</Text>
+            </div>
+
+            {/* Global format chips */}
+            <div className="flex flex-wrap gap-1.5 justify-center max-w-xl mt-1">
+              {GLOBAL_AUDIO_FORMATS.map((fmt) => (
+                <span
+                  key={fmt.extension}
+                  className={`text-xs px-2.5 py-1 rounded-full font-mono border transition-all ${
+                    fmt.isLossless
+                      ? "bg-m3-primary-container/50 text-m3-primary border-m3-primary/30 font-semibold"
+                      : "bg-m3-surface-container-high text-m3-on-surface-variant border-m3-outline-variant/40"
+                  }`}
+                  title={`${fmt.name}: ${fmt.description}`}
+                >
+                  .{fmt.extension.toUpperCase()}
+                  {fmt.isLossless && " ★"}
+                </span>
+              ))}
+            </div>
+
+            <Button
+              colorStyle="tonal"
+              icon={<Icon name="upload_file" size={18} />}
+              className="mt-2"
+              onClick={(e) => {
+                e.stopPropagation();
+                document.getElementById("tempo-upload")?.click();
+              }}
+            >
+              {language === "vi" ? "Chọn tệp âm thanh" : "Select Audio File"}
+            </Button>
+
             <input
               id="tempo-upload"
               type="file"
-              accept="audio/*"
+              accept={AUDIO_ACCEPT_STRING}
               className="hidden"
               onChange={handleFileChange}
             />
           </div>
         ) : (
           <div className="flex flex-col gap-4">
-            {/* File info bar */}
-            <div className="flex items-center gap-2 p-3 bg-m3-surface-container-low rounded-xl min-w-0">
+            {/* File info bar with format badge */}
+            <Card variant="filled" className="flex flex-wrap items-center justify-between gap-3 p-3.5 bg-m3-surface-container-low rounded-xl min-w-0 border border-m3-outline-variant/40">
               <div className="flex items-center gap-3 overflow-hidden min-w-0 flex-1">
-                <Icon name="album" className={`text-m3-primary shrink-0 ${isLoading ? "animate-spin" : ""}`} />
-                <div className="overflow-hidden">
-                  <Text variant="body-md" className="font-md text-m3-on-surface truncate block">
-                    {file.name}
-                  </Text>
+                <div className="w-10 h-10 rounded-xl bg-m3-primary-container flex items-center justify-center text-m3-on-primary-container shrink-0">
+                  <Icon name="album" className={isLoading ? "animate-spin" : ""} />
+                </div>
+                <div className="overflow-hidden min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Text variant="body-md" className="font-semibold text-m3-on-surface truncate">
+                      {file.name}
+                    </Text>
+                    {detectedFormat && (
+                      <span className={`text-[11px] px-2 py-0.5 rounded-md font-mono font-medium shrink-0 border ${
+                        (detectedFormat.isLossless ?? (detectedFormat.category === "lossless" || detectedFormat.category === "hi-res"))
+                          ? "bg-m3-primary-container/50 text-m3-primary border-m3-primary/30"
+                          : "bg-m3-secondary-container/50 text-m3-secondary border-m3-secondary/30"
+                      }`}>
+                        {detectedFormat.name}
+                      </span>
+                    )}
+                  </div>
                   <Text variant="body-sm" className="text-m3-on-surface-variant">
-                    {(file.size / (1024 * 1024)).toFixed(2)} MB
+                    {t("common_file_size")}: {(file.size / (1024 * 1024)).toFixed(2)} MB
                   </Text>
                 </div>
               </div>
               <Button
-                colorStyle="text"
+                colorStyle="outlined"
+                size="sm"
                 className="shrink-0"
+                icon={<Icon name="refresh" size={16} />}
                 onClick={() => {
                   setFile(null);
                   setResult(null);
+                  setDetectedFormat(null);
                 }}
                 disabled={isLoading}
               >
-                Đo bài khác
+                {t("tempo_check_another")}
               </Button>
-            </div>
+            </Card>
           </div>
         )}
 
         {isLoading && (
-          <div className="flex flex-col items-center gap-3 p-6">
-            <LoadingIndicator aria-label="Calculating song BPM" size={40} />
-            <Text variant="body-sm" className="text-m3-primary">Đang đếm nhịp trống bass và phân tích tốc độ BPM...</Text>
-          </div>
+          <Card variant="outlined" className="flex flex-col items-center justify-center gap-3.5 p-8 sm:p-10 bg-m3-surface-container-low/40 rounded-2xl border-m3-outline-variant/30 text-center">
+            <LoadingIndicator aria-label="Calculating song BPM" size={48} />
+            <Text variant="title-sm" className="text-m3-primary font-semibold">{t("tempo_analyzing")}</Text>
+            <Text variant="body-sm" className="text-m3-on-surface-variant max-w-md">
+              {language === "vi" ? "Đang phân tích phổ âm thanh và các đỉnh nhịp điệu trên máy của bạn..." : "Analyzing audio spectrum and rhythmic energy peaks locally..."}
+            </Text>
+          </Card>
         )}
 
         {result && (
-          <div className="flex flex-col items-center gap-4 p-4 bg-m3-primary-container/20 border border-m3-primary/10 rounded-2xl animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <Card variant="filled" className="flex flex-col items-center gap-5 p-6 bg-m3-primary-container/25 border border-m3-primary/30 rounded-2xl animate-in fade-in slide-in-from-bottom-2 duration-300">
             <div className="text-center">
-              <Text variant="body-sm" className="text-m3-on-surface-variant uppercase tracking-wider font-semibold">Kết quả đo tự động</Text>
-              <div className="flex items-baseline justify-center gap-1 mt-1">
-                <Text variant="display-lg" className="font-extrabold text-m3-primary font-mono tracking-tight">
+              <Text variant="body-sm" className="text-m3-on-surface-variant uppercase tracking-wider font-semibold">{t("tempo_result_label")}</Text>
+              <div className="flex items-baseline justify-center gap-1.5 mt-1">
+                <Text variant="display-lg" className="font-extrabold text-m3-primary font-mono tracking-tight text-5xl sm:text-6xl">
                   {result.bpm}
                 </Text>
-                <Text variant="title-md" className="text-m3-on-surface-variant font-md">BPM</Text>
+                <Text variant="title-md" className="text-m3-on-surface-variant font-semibold">BPM</Text>
               </div>
-              <div className="flex items-center justify-center gap-2 mt-2">
-                <Badge className={result.confidence > 75 ? "bg-green-600 text-white" : "bg-amber-600 text-white"}>
-                  Độ tin cậy: {result.confidence}%
-                </Badge>
-                <Text variant="body-sm" className="text-m3-on-surface-variant">
-                  Phát hiện {result.peaksCount} điểm nhấn
+              <div className="flex items-center justify-center gap-2.5 mt-2.5 flex-wrap">
+                <span className={`text-xs px-2.5 py-0.5 rounded-full font-mono font-semibold border ${
+                  result.confidence > 75
+                    ? "bg-m3-primary-container text-m3-on-primary-container border-m3-primary/40"
+                    : "bg-m3-tertiary-container text-m3-on-tertiary-container border-m3-tertiary/40"
+                }`}>
+                  {language === "vi" ? "Độ tin cậy" : "Confidence"}: {result.confidence}%
+                </span>
+                <Text variant="body-sm" className="text-m3-on-surface-variant font-medium">
+                  {language === "vi" ? `Phát hiện ${result.peaksCount} điểm nhấn nhịp` : `${result.peaksCount} rhythmic peaks`}
                 </Text>
               </div>
             </div>
 
             {/* Pulsing indicator to preview BPM speed */}
-            <div className="flex flex-col items-center gap-2 mt-2">
-              <div className={`w-16 h-16 rounded-full border-4 border-m3-primary/20 flex items-center justify-center transition-all duration-100 ${pulseActive ? "scale-125 bg-m3-primary/20 border-m3-primary/60" : "scale-100 bg-transparent"
-                }`}>
-                <Icon name="favorite" fill={pulseActive ? 1 : 0} size={28} className="text-m3-primary" />
+            <div className="flex flex-col items-center gap-2 mt-1">
+              <div className={`w-16 h-16 rounded-full border-4 flex items-center justify-center transition-all duration-100 ${
+                pulseActive
+                  ? "scale-125 bg-m3-primary-container/60 border-m3-primary shadow-md"
+                  : "scale-100 bg-m3-surface-container-low/60 border-m3-outline-variant/50"
+              }`}>
+                <Icon name="favorite" fill={pulseActive ? 1 : 0} size={28} className="text-m3-primary transition-all" />
               </div>
-              <Text variant="body-sm" className="text-m3-on-surface-variant text-center font-mono">Nhịp tim đập theo nhịp điệu của bài hát</Text>
+              <Text variant="body-sm" className="text-m3-on-surface-variant text-center font-mono text-xs">
+                {language === "vi" ? "Nhịp tim đập theo nhịp điệu của bài hát" : "Pulsing to detected track tempo"}
+              </Text>
             </div>
-          </div>
+          </Card>
         )}
-      </div>
+      </Card>
+
+      <Divider shape="wavy" />
 
       {/* Manual Tap Tempo Card */}
-      <div className="p-5 flex flex-col gap-4 overflow-hidden border border-m3-outline-variant/30 rounded-2xl bg-transparent">
+      <Card variant="outlined" className="p-4 sm:p-6 flex flex-col gap-5 overflow-hidden bg-m3-surface-container-lowest/40 rounded-2xl border-m3-outline-variant/40">
         <div className="flex items-start gap-3 min-w-0">
           <IconButton colorStyle="tonal" aria-label="Manual tap">
-            <Icon name="play_arrow" className="text-m3-secondary rotate-90" />
+            <Icon name="touch_app" className="text-m3-secondary" />
           </IconButton>
           <div>
-            <Text variant="title-md" className="font-semibold text-m3-on-surface">Gõ Nhịp thủ công (Tap Tempo)</Text>
-            <Text variant="body-sm" className="text-m3-on-surface-variant">Nhấp chuột hoặc chạm tay vào nút đệm theo nhịp nhạc đang nghe để tự ước lượng BPM.</Text>
+            <Text variant="title-md" className="font-semibold text-m3-on-surface">{t("tempo_tap_title")}</Text>
+            <Text variant="body-sm" className="text-m3-on-surface-variant">{t("tempo_tap_desc")}</Text>
           </div>
         </div>
 
-        <div className="flex flex-col items-center gap-4 py-3">
+        <div className="flex flex-col items-center gap-5 py-2">
           <div className="text-center h-20 flex flex-col justify-center">
             {tapBPM ? (
               <div className="animate-in zoom-in-95 duration-100">
-                <Text variant="body-sm" className="text-m3-on-surface-variant uppercase tracking-wider font-semibold">Tốc độ hiện tại</Text>
-                <div className="flex items-baseline justify-center gap-1">
-                  <Text variant="display-lg" className="font-extrabold text-m3-secondary font-mono">
+                <Text variant="body-sm" className="text-m3-on-surface-variant uppercase tracking-wider font-semibold">{t("tempo_tap_current")}</Text>
+                <div className="flex items-baseline justify-center gap-1.5 mt-0.5">
+                  <Text variant="display-lg" className="font-extrabold text-m3-secondary font-mono text-5xl sm:text-6xl">
                     {tapBPM}
                   </Text>
-                  <Text variant="title-md" className="text-m3-on-surface-variant font-md">BPM</Text>
+                  <Text variant="title-md" className="text-m3-on-surface-variant font-semibold">BPM</Text>
                 </div>
               </div>
             ) : (
               <div className="flex flex-col items-center gap-1">
-                <Text variant="body-md" className="text-m3-on-surface-variant italic">Nhấn phím hoặc đệm nút bên dưới...</Text>
-                <Text variant="body-sm" className="text-m3-on-surface-variant/70 text-xs">Hãy chạm từ 4 nhịp trở lên liên tục</Text>
+                <Text variant="body-md" className="text-m3-on-surface-variant italic font-medium">
+                  {language === "vi" ? "Nhấn phím hoặc chạm nút bên dưới theo nhịp..." : "Click or tap button rhythmically..."}
+                </Text>
+                <Text variant="body-sm" className="text-m3-on-surface-variant/80 text-xs">
+                  {language === "vi" ? "Hãy đệm từ 4 nhịp trở lên liên tục" : "Tap at least 4 times consistently"}
+                </Text>
               </div>
             )}
           </div>
 
-          {/* Big Tap Button */}
-          <button
+          {/* Big Tap Interactive Card */}
+          <Card
+            interactive
+            variant="filled"
             onClick={handleTap}
-            className={`w-full max-w-70 h-35 rounded-3xl border-2 border-m3-secondary/30 flex flex-col items-center justify-center gap-2 cursor-pointer outline-none select-none active:scale-95 transition-all duration-100 ${pulseActive && tapBPM
-                ? "bg-m3-secondary/20 border-m3-secondary shadow-md"
-                : "bg-m3-surface-container-low hover:bg-m3-surface-container-high"
-              }`}
+            className={`w-full max-w-72 h-36 rounded-3xl border-2 flex flex-col items-center justify-center gap-2 cursor-pointer select-none active:scale-95 transition-all duration-150 ${
+              pulseActive && tapBPM
+                ? "bg-m3-secondary-container/50 border-m3-secondary shadow-md"
+                : "bg-m3-surface-container-low border-m3-outline-variant/40 hover:bg-m3-surface-container-high"
+            }`}
           >
-            <Icon name="album" size={40} className={`text-m3-secondary transition-transform duration-100 ${pulseActive && tapBPM ? "rotate-45" : ""}`} />
-            <Text variant="title-md" className="font-bold text-m3-on-surface">ĐỆM NHỊP VÀO ĐÂY</Text>
-            <Text variant="body-sm" className="text-m3-on-surface-variant text-xs">
-              {tapTimes.length > 0 ? `Đã đệm ${tapTimes.length} lần` : "Tap to Beat"}
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-transform duration-150 ${
+              pulseActive && tapBPM ? "scale-110 bg-m3-secondary text-m3-on-secondary" : "bg-m3-secondary-container/50 text-m3-secondary"
+            }`}>
+              <Icon name="album" size={28} className={pulseActive && tapBPM ? "rotate-45" : ""} />
+            </div>
+            <Text variant="title-md" className="font-bold text-m3-on-surface">{t("tempo_tap_button")}</Text>
+            <Text variant="body-sm" className="text-m3-on-surface-variant text-xs font-mono">
+              {tapTimes.length > 0
+                ? (language === "vi" ? `Đã đệm ${tapTimes.length} lần` : `${tapTimes.length} taps recorded`)
+                : (language === "vi" ? "Chạm hoặc đệm theo nhịp" : "Tap to Beat")}
             </Text>
-          </button>
+          </Card>
 
           {tapTimes.length > 0 && (
             <Button
-              colorStyle="text"
+              colorStyle="outlined"
+              size="sm"
+              icon={<Icon name="restart_alt" size={16} />}
               onClick={resetTap}
             >
-              Đặt lại đệm nhịp
+              {t("tempo_tap_reset")}
             </Button>
           )}
         </div>
-      </div>
+      </Card>
     </div>
   );
 }
