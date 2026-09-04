@@ -18,6 +18,7 @@ import {
   TextField,
 } from "@bug-on/m3-expressive";
 import { useLanguage } from "../i18n/LanguageContext";
+import { AppLogo } from "./AppLogo";
 
 export interface ColorPreset {
   id: string;
@@ -523,12 +524,17 @@ export function SettingsPage() {
         variant="outlined"
         className="p-4 sm:p-6 flex flex-col gap-5 overflow-hidden bg-m3-surface-container-lowest/40 rounded-2xl border-m3-outline-variant/40"
       >
-        <div className="flex items-center gap-2.5">
-          <Icon name="info" className="text-m3-primary" size={24} />
+        <div className="flex items-center gap-3.5">
+          <AppLogo size={42} className="shrink-0 drop-shadow-md" />
           <div>
-            <Text variant="title-md" className="font-semibold text-m3-on-surface">
-              {t("settings_about_title")}
-            </Text>
+            <div className="flex items-center gap-2">
+              <Text variant="title-md" className="font-semibold text-m3-on-surface">
+                {t("settings_about_title")}
+              </Text>
+              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-m3-primary/15 text-m3-primary border border-m3-primary/30">
+                v1.0.0
+              </span>
+            </div>
             <Text variant="body-sm" className="text-m3-on-surface-variant">
               {t("settings_about_desc")}
             </Text>

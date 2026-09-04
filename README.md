@@ -1,4 +1,8 @@
 
+<p align="center">
+  <img src="public/icon.svg" width="96" height="96" alt="Stark Synthwave Logo" />
+</p>
+
 # Stark Synthwave
 
 A modern, high-fidelity web application providing essential in-browser audio processing tools. Featuring a premium dark synthwave design unified around Material Design 3 Expressive guidelines, it is optimized for high-performance audio manipulation and analysis directly in the browser.
