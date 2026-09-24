@@ -1,303 +1,64 @@
-<svg viewBox="0 0 512 512" width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <!-- Dark Graphite Matte Shell — main body fill -->
-    <linearGradient id="shell-body" x1="30%" y1="0%" x2="70%" y2="100%">
-      <stop offset="0%"   stop-color="#3A4150" />
-      <stop offset="35%"  stop-color="#2A303C" />
-      <stop offset="70%"  stop-color="#1E232C" />
-      <stop offset="100%" stop-color="#141820" />
-    </linearGradient>
-
-    <!-- Top specular highlight on curved shell surface -->
-    <linearGradient id="shell-top-spec" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%"   stop-color="#6B7A90" stop-opacity="0.7" />
-      <stop offset="40%"  stop-color="#485060" stop-opacity="0.3" />
-      <stop offset="100%" stop-color="#1E232C" stop-opacity="0" />
-    </linearGradient>
-
-    <!-- Side edge highlight — left rim catch-light -->
-    <linearGradient id="shell-left-rim" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%"   stop-color="#7A8CA0" stop-opacity="0.5" />
-      <stop offset="30%"  stop-color="#485060" stop-opacity="0.15" />
-      <stop offset="100%" stop-color="#1E232C" stop-opacity="0" />
-    </linearGradient>
-
-    <!-- Groove shadow — depth of the recessed inner trench -->
-    <linearGradient id="groove-shadow" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%"   stop-color="#080B10" />
-      <stop offset="50%"  stop-color="#0D1119" />
-      <stop offset="100%" stop-color="#13171F" />
-    </linearGradient>
-
-    <!-- Groove ambient glow from neon core light bounce -->
-    <radialGradient id="groove-glow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%"   stop-color="#00C8FF" stop-opacity="0.18" />
-      <stop offset="60%"  stop-color="#4F6EF5" stop-opacity="0.07" />
-      <stop offset="100%" stop-color="#0D1119"  stop-opacity="0" />
-    </radialGradient>
-
-    <!-- Neon luminous tube — indigo to electric cyan -->
-    <linearGradient id="neon-core" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%"   stop-color="#5865F2" />
-      <stop offset="30%"  stop-color="#4F83EF" />
-      <stop offset="55%"  stop-color="#0EA5E9" />
-      <stop offset="80%"  stop-color="#00DEFF" />
-      <stop offset="100%" stop-color="#38BDF8" />
-    </linearGradient>
-
-    <!-- Neon glow halo (wide diffuse underlay) -->
-    <linearGradient id="neon-glow" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%"   stop-color="#4F6EF5" />
-      <stop offset="50%"  stop-color="#00C8FF" />
-      <stop offset="100%" stop-color="#38BDF8" />
-    </linearGradient>
-
-    <!-- Neon core bright center highlight -->
-    <linearGradient id="neon-highlight" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%"   stop-color="#AABFFF" />
-      <stop offset="50%"  stop-color="#E8F8FF" />
-      <stop offset="100%" stop-color="#B8EEFF" />
-    </linearGradient>
-
-    <!-- Bottom shadow / contact shadow -->
-    <radialGradient id="contact-shadow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%"   stop-color="#000307" stop-opacity="0.55" />
-      <stop offset="60%"  stop-color="#000307" stop-opacity="0.2" />
-      <stop offset="100%" stop-color="#000307" stop-opacity="0" />
-    </radialGradient>
-
-    <!-- Clipping mask to confine neon glow inside the organic shell shape -->
-    <clipPath id="shell-clip">
-      <path d="
-        M 68 256
-        C 68 176, 100 130, 140 118
-        C 158 112, 170 108, 185 115
-        C 195 120, 202 130, 210 128
-        C 218 126, 226 112, 236 108
-        C 246 104, 256 102, 266 106
-        C 276 110, 284 124, 292 126
-        C 300 128, 308 120, 318 116
-        C 330 110, 345 112, 362 120
-        C 400 136, 444 180, 444 256
-        C 444 332, 400 376, 362 392
-        C 345 400, 330 402, 318 396
-        C 308 392, 300 384, 292 386
-        C 284 388, 276 402, 266 406
-        C 256 410, 246 408, 236 404
-        C 226 400, 218 386, 210 384
-        C 202 382, 195 392, 185 397
-        C 170 404, 158 400, 140 394
-        C 100 382, 68 336, 68 256 Z
-      " />
-    </clipPath>
-  </defs>
-
-  <!-- Layer 0: Contact shadow (soft drop below icon) -->
-  <ellipse cx="256" cy="460" rx="165" ry="26" fill="url(#contact-shadow)" />
-
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- Layer 1: Outer Shell — Dark Graphite Clay   -->
-  <!-- Organic silhouette: 5 wave peaks top & bottom -->
-  <!-- ═══════════════════════════════════════════ -->
-
-  <!-- Main shell body path - acoustic envelope silhouette -->
-  <path d="
-    M 68 256
-    C 68 176, 100 130, 140 118
-    C 158 112, 170 108, 185 115
-    C 195 120, 202 130, 210 128
-    C 218 126, 226 112, 236 108
-    C 246 104, 256 102, 266 106
-    C 276 110, 284 124, 292 126
-    C 300 128, 308 120, 318 116
-    C 330 110, 345 112, 362 120
-    C 400 136, 444 180, 444 256
-    C 444 332, 400 376, 362 392
-    C 345 400, 330 402, 318 396
-    C 308 392, 300 384, 292 386
-    C 284 388, 276 402, 266 406
-    C 256 410, 246 408, 236 404
-    C 226 400, 218 386, 210 384
-    C 202 382, 195 392, 185 397
-    C 170 404, 158 400, 140 394
-    C 100 382, 68 336, 68 256 Z
-  "
-    fill="url(#shell-body)"
-  />
-
-  <!-- Top surface specular highlight — soft matte sheen -->
-  <path d="
-    M 68 256
-    C 68 176, 100 130, 140 118
-    C 158 112, 170 108, 185 115
-    C 195 120, 202 130, 210 128
-    C 218 126, 226 112, 236 108
-    C 246 104, 256 102, 266 106
-    C 276 110, 284 124, 292 126
-    C 300 128, 308 120, 318 116
-    C 330 110, 345 112, 362 120
-    C 400 136, 444 180, 444 256
-    L 68 256 Z
-  "
-    fill="url(#shell-top-spec)"
-  />
-
-  <!-- Left-edge rim catch-light -->
-  <path d="
-    M 68 256
-    C 68 200, 88 160, 115 138
-    C 125 130, 135 124, 140 118
-    C 158 112, 170 108, 185 115
-    C 195 120, 202 130, 210 128
-    L 140 256 Z
-  "
-    fill="url(#shell-left-rim)"
-    opacity="0.6"
-  />
-
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- Layer 2: Recessed Inner Groove              -->
-  <!-- The dark trench that holds the neon tube    -->
-  <!-- ═══════════════════════════════════════════ -->
-
-  <!-- Groove wall (inset shadow border) -->
-  <path d="
-    M 100 256
-    C 100 196, 124 157, 155 146
-    C 167 142, 178 141, 190 148
-    C 200 154, 206 165, 213 164
-    C 220 163, 229 150, 240 147
-    C 248 144, 256 143, 264 146
-    C 272 149, 281 162, 288 163
-    C 295 164, 302 155, 313 150
-    C 324 144, 337 143, 350 149
-    C 380 162, 412 198, 412 256
-    C 412 314, 380 350, 350 363
-    C 337 369, 324 368, 313 362
-    C 302 357, 295 348, 288 349
-    C 281 350, 272 363, 264 366
-    C 256 369, 248 368, 240 365
-    C 229 362, 220 349, 213 348
-    C 206 347, 200 358, 190 364
-    C 178 371, 167 370, 155 366
-    C 124 355, 100 316, 100 256 Z
-  "
-    fill="url(#groove-shadow)"
-  />
-
-  <!-- Groove ambient glow overlay from neon bounce-back -->
-  <path d="
-    M 108 256
-    C 108 200, 130 163, 158 152
-    C 169 148, 179 148, 191 154
-    C 200 159, 206 168, 213 167
-    C 220 166, 229 154, 240 151
-    C 248 148, 256 147, 264 150
-    C 272 153, 281 165, 288 166
-    C 295 167, 303 158, 314 153
-    C 325 148, 337 148, 349 154
-    C 377 166, 404 200, 404 256
-    C 404 312, 377 346, 349 358
-    C 337 364, 325 364, 314 359
-    C 303 354, 295 345, 288 346
-    C 281 347, 272 359, 264 362
-    C 256 365, 248 364, 240 361
-    C 229 358, 220 346, 213 345
-    C 206 344, 200 353, 191 358
-    C 179 364, 169 364, 158 360
-    C 130 349, 108 312, 108 256 Z
-  "
-    fill="url(#groove-glow)"
-  />
-
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- Layer 3: Neon Luminous Waveform Tube        -->
-  <!-- Sine wave path — wide glow + core + center  -->
-  <!-- ═══════════════════════════════════════════ -->
-
-  <!-- Neon glow layer (wide diffuse halo — outermost) -->
-  <path
-    d="M 116 256 C 150 166, 196 166, 222 256 C 248 346, 294 346, 328 256 C 352 196, 380 196, 396 256"
-    fill="none"
-    stroke="url(#neon-glow)"
-    stroke-width="52"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    opacity="0.28"
-    clip-path="url(#shell-clip)"
-  />
-
-  <!-- Neon medium bloom (mid intensity) -->
-  <path
-    d="M 116 256 C 150 166, 196 166, 222 256 C 248 346, 294 346, 328 256 C 352 196, 380 196, 396 256"
-    fill="none"
-    stroke="url(#neon-glow)"
-    stroke-width="32"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    opacity="0.45"
-    clip-path="url(#shell-clip)"
-  />
-
-  <!-- Neon core tube (main colored stroke) -->
-  <path
-    d="M 116 256 C 150 166, 196 166, 222 256 C 248 346, 294 346, 328 256 C 352 196, 380 196, 396 256"
-    fill="none"
-    stroke="url(#neon-core)"
-    stroke-width="18"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    clip-path="url(#shell-clip)"
-  />
-
-  <!-- Neon specular highlight (bright white-ish center of tube) -->
-  <path
-    d="M 116 256 C 150 166, 196 166, 222 256 C 248 346, 294 346, 328 256 C 352 196, 380 196, 396 256"
-    fill="none"
-    stroke="url(#neon-highlight)"
-    stroke-width="6"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    opacity="0.75"
-    clip-path="url(#shell-clip)"
-  />
-
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- Layer 4: Surface micro-detail               -->
-  <!-- Wave ridge line on outer shell surface      -->
-  <!-- ═══════════════════════════════════════════ -->
-
-  <!-- Top ridge fine catch-light line -->
-  <path d="
-    M 150 136
-    C 170 122, 185 118, 200 122
-    C 210 125, 218 132, 228 130
-    C 238 128, 246 116, 256 114
-    C 266 112, 274 124, 282 128
-    C 292 132, 306 124, 320 118
-    C 338 112, 355 116, 370 128
-  "
-    fill="none"
-    stroke="#7A8CA0"
-    stroke-width="2.5"
-    stroke-linecap="round"
-    opacity="0.5"
-  />
-
-  <!-- Subtle bottom ridge highlight -->
-  <path d="
-    M 150 376
-    C 170 390, 185 394, 200 390
-    C 210 387, 218 380, 228 382
-    C 238 384, 246 396, 256 398
-    C 266 400, 274 388, 282 384
-    C 292 380, 306 388, 320 394
-    C 338 400, 355 396, 370 384
-  "
-    fill="none"
-    stroke="#38414F"
-    stroke-width="2"
-    stroke-linecap="round"
-    opacity="0.4"
-  />
+<svg width="720" height="720" viewBox="0 0 720 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M510 58H210C132.68 58 70 120.68 70 198V498C70 575.32 132.68 638 210 638H510C587.32 638 650 575.32 650 498V198C650 120.68 587.32 58 510 58Z" fill="url(#paint0_linear_6_2)"/>
+<mask id="mask0_6_2" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="70" y="58" width="580" height="580">
+<path d="M510 58H210C132.68 58 70 120.68 70 198V498C70 575.32 132.68 638 210 638H510C587.32 638 650 575.32 650 498V198C650 120.68 587.32 58 510 58Z" fill="white"/>
+</mask>
+<g mask="url(#mask0_6_2)">
+<g opacity="0.42">
+<path d="M500 284C550.81 284 592 242.81 592 192C592 141.19 550.81 100 500 100C449.19 100 408 141.19 408 192C408 242.81 449.19 284 500 284Z" fill="url(#paint1_linear_6_2)"/>
+<path d="M82 495H638M96 530H624M116 564H604M144 596H576" stroke="#B342FF" stroke-width="4"/>
+<path d="M526 638L357 444L222 638M357 444L280 638M357 444L334 638M357 444L392 638M357 444L454 638" stroke="#2FE8FF" stroke-width="3"/>
+</g>
+</g>
+<path d="M321 230L515 182V410" stroke="url(#paint2_linear_6_2)" stroke-width="54" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M321 230V455" stroke="url(#paint3_linear_6_2)" stroke-width="54" stroke-linecap="round"/>
+<path d="M289.159 529.966C330.129 516.654 354.764 479.462 344.182 446.897C333.601 414.331 291.811 398.723 250.841 412.034C209.871 425.346 185.236 462.538 195.818 495.103C206.399 527.669 248.189 543.277 289.159 529.966Z" fill="url(#paint4_linear_6_2)"/>
+<path d="M483.159 484.966C524.129 471.654 548.764 434.462 538.182 401.897C527.601 369.331 485.811 353.723 444.841 367.034C403.871 380.346 379.236 417.538 389.818 450.103C400.399 482.669 442.189 498.277 483.159 484.966Z" fill="url(#paint5_linear_6_2)"/>
+<path d="M322 230L514 183" stroke="#B8FBFF" stroke-opacity="0.72" stroke-width="12" stroke-linecap="round"/>
+<path d="M236 589C292.885 589 339 542.885 339 486C339 429.115 292.885 383 236 383C179.115 383 133 429.115 133 486C133 542.885 179.115 589 236 589Z" fill="url(#paint6_linear_6_2)" stroke="#16082F" stroke-width="18"/>
+<path d="M236 559C276.317 559 309 526.317 309 486C309 445.683 276.317 413 236 413C195.683 413 163 445.683 163 486C163 526.317 195.683 559 236 559Z" fill="#13072D" fill-opacity="0.9"/>
+<path d="M194 486L224 516L282 452" stroke="white" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M548 351C552.971 351 557 346.971 557 342C557 337.029 552.971 333 548 333C543.029 333 539 337.029 539 342C539 346.971 543.029 351 548 351Z" fill="#00F5FF"/>
+<path d="M575 324C578.314 324 581 321.314 581 318C581 314.686 578.314 312 575 312C571.686 312 569 314.686 569 318C569 321.314 571.686 324 575 324Z" fill="#FF62C5"/>
+<defs>
+<linearGradient id="paint0_linear_6_2" x1="112" y1="88" x2="608" y2="632" gradientUnits="userSpaceOnUse">
+<stop stop-color="#12062C"/>
+<stop offset="0.52" stop-color="#231052"/>
+<stop offset="1" stop-color="#09031B"/>
+</linearGradient>
+<linearGradient id="paint1_linear_6_2" x1="485" y1="122" x2="485" y2="292" gradientUnits="userSpaceOnUse">
+<stop stop-color="#FFD15A"/>
+<stop offset="0.45" stop-color="#FF6F91"/>
+<stop offset="1" stop-color="#D83BFF"/>
+</linearGradient>
+<linearGradient id="paint2_linear_6_2" x1="220" y1="178" x2="544" y2="512" gradientUnits="userSpaceOnUse">
+<stop stop-color="#00F5FF"/>
+<stop offset="0.42" stop-color="#6C5CFF"/>
+<stop offset="0.73" stop-color="#E43CFF"/>
+<stop offset="1" stop-color="#FF427F"/>
+</linearGradient>
+<linearGradient id="paint3_linear_6_2" x1="220" y1="178" x2="544" y2="512" gradientUnits="userSpaceOnUse">
+<stop stop-color="#00F5FF"/>
+<stop offset="0.42" stop-color="#6C5CFF"/>
+<stop offset="0.73" stop-color="#E43CFF"/>
+<stop offset="1" stop-color="#FF427F"/>
+</linearGradient>
+<linearGradient id="paint4_linear_6_2" x1="131.905" y1="207.791" x2="543.259" y2="425.323" gradientUnits="userSpaceOnUse">
+<stop stop-color="#00F5FF"/>
+<stop offset="0.42" stop-color="#6C5CFF"/>
+<stop offset="0.73" stop-color="#E43CFF"/>
+<stop offset="1" stop-color="#FF427F"/>
+</linearGradient>
+<linearGradient id="paint5_linear_6_2" x1="155.306" y1="265.538" x2="566.66" y2="483.07" gradientUnits="userSpaceOnUse">
+<stop stop-color="#00F5FF"/>
+<stop offset="0.42" stop-color="#6C5CFF"/>
+<stop offset="0.73" stop-color="#E43CFF"/>
+<stop offset="1" stop-color="#FF427F"/>
+</linearGradient>
+<linearGradient id="paint6_linear_6_2" x1="170" y1="390" x2="360" y2="584" gradientUnits="userSpaceOnUse">
+<stop stop-color="#00F5FF"/>
+<stop offset="0.48" stop-color="#7657FF"/>
+<stop offset="1" stop-color="#FF3DA5"/>
+</linearGradient>
+</defs>
 </svg>

@@ -1,249 +1,335 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
+import { ShapeMedia } from "@bug-on/m3-expressive";
+import { useId } from "react";
+import { cn } from "../utils/cn";
 
-import React, { useId } from "react";
-import { cn } from "@bug-on/m3-expressive";
+export type AppLogoVariant = "full" | "adaptive" | "transparent";
 
-interface AppLogoProps {
-  className?: string;
-  size?: number;
-  interactive?: boolean;
-  onClick?: () => void;
-  title?: string;
+export interface AppLogoProps {
+	className?: string;
+	size?: number;
+	variant?: AppLogoVariant;
+	/** Custom background color or CSS variable override when in adaptive mode */
+	adaptiveBgColor?: string;
+	interactive?: boolean;
+	onClick?: () => void;
+	title?: string;
 }
 
 /**
  * Stark Synthwave Brand Logo Component
- * 3D Claymorphic Soundwave — dark graphite matte shell with luminous
- * indigo-to-cyan neon tube, matching public/icon.svg master vector.
+ *
+ * Implements the official Synthwave Lossless Checker iconography:
+ * - Retro-futuristic Synthwave Sun & Perspective Grid
+ * - Dual neon-beamed musical notes with rainbow gradient
+ * - Lossless verified checkmark shield badge
+ *
+ * Supports 3 MD3 Expressive variants:
+ * - "full" (default): Rich cosmic Synthwave squircle background (#12062C -> #231052 -> #09031B)
+ * - "adaptive": Dynamic background using Material Design 3 container tokens or custom theme color
+ * - "transparent": Pure NoBG mode for seamless overlay on custom UI containers and surfaces
  */
 export function AppLogo({
-  className,
-  size = 36,
-  interactive = false,
-  onClick,
-  title = "Stark Synthwave",
+	className,
+	size = 36,
+	variant = "full",
+	adaptiveBgColor,
+	interactive = false,
+	onClick,
+	title = "Stark Synthwave",
 }: AppLogoProps) {
-  const rawId = useId();
-  const uid = rawId.replace(/[^a-zA-Z0-9_-]/g, "");
+	const rawId = useId();
+	const uid = rawId.replace(/[^a-zA-Z0-9_-]/g, "");
 
-  return (
-    <div
-      className={cn(
-        "relative flex items-center justify-center shrink-0 select-none",
-        interactive &&
-          "cursor-pointer active:scale-95 hover:brightness-110 transition-all duration-200 group",
-        className
-      )}
-      style={{ width: size, height: size }}
-      onClick={interactive ? onClick : undefined}
-      title={title}
-      aria-label={title}
-      role={interactive ? "button" : "img"}
-    >
-      <svg
-        width={size}
-        height={size}
-        viewBox="0 0 512 512"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className={cn(
-          "w-full h-full drop-shadow-sm transition-transform duration-200",
-          interactive && "group-hover:scale-105"
-        )}
-      >
-        <defs>
-          {/* Dark Graphite Matte Shell — main body fill */}
-          <linearGradient id={`${uid}-shell-body`} x1="30%" y1="0%" x2="70%" y2="100%">
-            <stop offset="0%"   stopColor="#3A4150" />
-            <stop offset="35%"  stopColor="#2A303C" />
-            <stop offset="70%"  stopColor="#1E232C" />
-            <stop offset="100%" stopColor="#141820" />
-          </linearGradient>
+	const svgContent = (
+		<svg
+			width={size}
+			height={size}
+			viewBox="0 0 720 720"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			className={cn(
+				"w-full h-full drop-shadow-sm transition-transform duration-200",
+				interactive && "group-hover:scale-105",
+			)}
+		>
+			<defs>
+				{/* Synthwave Signature Cosmic Squircle Background */}
+				{/* <linearGradient
+					id={`${uid}-bg-synthwave`}
+					x1="112"
+					y1="88"
+					x2="608"
+					y2="632"
+					gradientUnits="userSpaceOnUse"
+				>
+					<stop stopColor="#12062C" />
+					<stop offset="0.52" stopColor="#231052" />
+					<stop offset="1" stopColor="#09031B" />
+				</linearGradient> */}
 
-          {/* Top specular — soft matte sheen */}
-          <linearGradient id={`${uid}-shell-spec`} x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%"   stopColor="#6B7A90" stopOpacity="0.7" />
-            <stop offset="40%"  stopColor="#485060" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="#1E232C" stopOpacity="0" />
-          </linearGradient>
+				{/* MD3 Expressive Adaptive Gradient */}
+				<linearGradient
+					id={`${uid}-bg-adaptive`}
+					x1="112"
+					y1="88"
+					x2="608"
+					y2="632"
+					gradientUnits="userSpaceOnUse"
+				>
+					<stop
+						stopColor="var(--md-sys-color-surface-container-high, #1E1A24)"
+						stopOpacity="0.95"
+					/>
+					<stop
+						offset="0.52"
+						stopColor="var(--md-sys-color-surface-container, #16121C)"
+						stopOpacity="0.9"
+					/>
+					<stop
+						offset="1"
+						stopColor="var(--md-sys-color-surface-container-low, #0E0A14)"
+						stopOpacity="0.95"
+					/>
+				</linearGradient>
 
-          {/* Left edge rim catch-light */}
-          <linearGradient id={`${uid}-shell-rim`} x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%"   stopColor="#7A8CA0" stopOpacity="0.5" />
-            <stop offset="30%"  stopColor="#485060" stopOpacity="0.15" />
-            <stop offset="100%" stopColor="#1E232C" stopOpacity="0" />
-          </linearGradient>
+				{/* Synthwave Sun Radial/Linear Gradient */}
+				<linearGradient
+					id={`${uid}-sun`}
+					x1="485"
+					y1="122"
+					x2="485"
+					y2="292"
+					gradientUnits="userSpaceOnUse"
+				>
+					<stop stopColor="#FFD15A" />
+					<stop offset="0.45" stopColor="#FF6F91" />
+					<stop offset="1" stopColor="#D83BFF" />
+				</linearGradient>
 
-          {/* Groove shadow — recessed trench depth */}
-          <linearGradient id={`${uid}-groove`} x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%"   stopColor="#080B10" />
-            <stop offset="50%"  stopColor="#0D1119" />
-            <stop offset="100%" stopColor="#13171F" />
-          </linearGradient>
+				{/* Neon Waveform Beamed Note Gradient */}
+				<linearGradient
+					id={`${uid}-note-beam`}
+					x1="220"
+					y1="178"
+					x2="544"
+					y2="512"
+					gradientUnits="userSpaceOnUse"
+				>
+					<stop stopColor="#00F5FF" />
+					<stop offset="0.42" stopColor="#6C5CFF" />
+					<stop offset="0.73" stopColor="#E43CFF" />
+					<stop offset="1" stopColor="#FF427F" />
+				</linearGradient>
 
-          {/* Groove ambient neon bounce-glow */}
-          <radialGradient id={`${uid}-groove-glow`} cx="50%" cy="50%" r="50%">
-            <stop offset="0%"   stopColor="#00C8FF" stopOpacity="0.18" />
-            <stop offset="60%"  stopColor="#4F6EF5" stopOpacity="0.07" />
-            <stop offset="100%" stopColor="#0D1119"  stopOpacity="0" />
-          </radialGradient>
+				{/* Left Note Head Gradient */}
+				<linearGradient
+					id={`${uid}-head-left`}
+					x1="131.905"
+					y1="207.791"
+					x2="543.259"
+					y2="425.323"
+					gradientUnits="userSpaceOnUse"
+				>
+					<stop stopColor="#00F5FF" />
+					<stop offset="0.42" stopColor="#6C5CFF" />
+					<stop offset="0.73" stopColor="#E43CFF" />
+					<stop offset="1" stopColor="#FF427F" />
+				</linearGradient>
 
-          {/* Neon luminous tube — indigo to electric cyan */}
-          <linearGradient id={`${uid}-neon-core`} x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%"   stopColor="#5865F2" />
-            <stop offset="30%"  stopColor="#4F83EF" />
-            <stop offset="55%"  stopColor="#0EA5E9" />
-            <stop offset="80%"  stopColor="#00DEFF" />
-            <stop offset="100%" stopColor="#38BDF8" />
-          </linearGradient>
+				{/* Right Note Head Gradient */}
+				<linearGradient
+					id={`${uid}-head-right`}
+					x1="155.306"
+					y1="265.538"
+					x2="566.66"
+					y2="483.07"
+					gradientUnits="userSpaceOnUse"
+				>
+					<stop stopColor="#00F5FF" />
+					<stop offset="0.42" stopColor="#6C5CFF" />
+					<stop offset="0.73" stopColor="#E43CFF" />
+					<stop offset="1" stopColor="#FF427F" />
+				</linearGradient>
 
-          {/* Neon glow halo (diffuse underlay) */}
-          <linearGradient id={`${uid}-neon-glow`} x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%"   stopColor="#4F6EF5" />
-            <stop offset="50%"  stopColor="#00C8FF" />
-            <stop offset="100%" stopColor="#38BDF8" />
-          </linearGradient>
+				{/* Lossless Verified Shield Ring Gradient */}
+				<linearGradient
+					id={`${uid}-shield-ring`}
+					x1="170"
+					y1="390"
+					x2="360"
+					y2="584"
+					gradientUnits="userSpaceOnUse"
+				>
+					<stop stopColor="#00F5FF" />
+					<stop offset="0.48" stopColor="#7657FF" />
+					<stop offset="1" stopColor="#FF3DA5" />
+				</linearGradient>
 
-          {/* Neon core specular highlight */}
-          <linearGradient id={`${uid}-neon-hl`} x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%"   stopColor="#AABFFF" />
-            <stop offset="50%"  stopColor="#E8F8FF" />
-            <stop offset="100%" stopColor="#B8EEFF" />
-          </linearGradient>
+				{/* Luminance Mask clipping grid and sun into squircle */}
+				<mask
+					id={`${uid}-squircle-mask`}
+					style={{ maskType: "luminance" }}
+					maskUnits="userSpaceOnUse"
+					x="70"
+					y="58"
+					width="580"
+					height="580"
+				>
+					<path
+						d="M510 58H210C132.68 58 70 120.68 70 198V498C70 575.32 132.68 638 210 638H510C587.32 638 650 575.32 650 498V198C650 120.68 587.32 58 510 58Z"
+						fill="white"
+					/>
+				</mask>
+			</defs>
 
-          {/* Contact shadow */}
-          <radialGradient id={`${uid}-shadow`} cx="50%" cy="50%" r="50%">
-            <stop offset="0%"   stopColor="#000307" stopOpacity="0.55" />
-            <stop offset="60%"  stopColor="#000307" stopOpacity="0.2" />
-            <stop offset="100%" stopColor="#000307" stopOpacity="0" />
-          </radialGradient>
+			{/* 1. Base Squircle Container (Full or Adaptive) */}
+			{variant === "full" && (
+				<path
+					d="M510 58H210C132.68 58 70 120.68 70 198V498C70 575.32 132.68 638 210 638H510C587.32 638 650 575.32 650 498V198C650 120.68 587.32 58 510 58Z"
+					fill={`url(#${uid}-bg-synthwave)`}
+				/>
+			)}
+			{variant === "adaptive" && (
+				<path
+					d="M510 58H210C132.68 58 70 120.68 70 198V498C70 575.32 132.68 638 210 638H510C587.32 638 650 575.32 650 498V198C650 120.68 587.32 58 510 58Z"
+					fill={adaptiveBgColor || `url(#${uid}-bg-adaptive)`}
+				/>
+			)}
 
-          {/* Clip path — organic acoustic waveform silhouette */}
-          <clipPath id={`${uid}-clip`}>
-            <path d="
-              M 68 256
-              C 68 176, 100 130, 140 118
-              C 158 112, 170 108, 185 115
-              C 195 120, 202 130, 210 128
-              C 218 126, 226 112, 236 108
-              C 246 104, 256 102, 266 106
-              C 276 110, 284 124, 292 126
-              C 300 128, 308 120, 318 116
-              C 330 110, 345 112, 362 120
-              C 400 136, 444 180, 444 256
-              C 444 332, 400 376, 362 392
-              C 345 400, 330 402, 318 396
-              C 308 392, 300 384, 292 386
-              C 284 388, 276 402, 266 406
-              C 256 410, 246 408, 236 404
-              C 226 400, 218 386, 210 384
-              C 202 382, 195 392, 185 397
-              C 170 404, 158 400, 140 394
-              C 100 382, 68 336, 68 256 Z
-            " />
-          </clipPath>
-        </defs>
+			{/* 2. Synthwave Sun & Perspective Horizon Grid (Masked) */}
+			<g mask={`url(#${uid}-squircle-mask)`}>
+				<g opacity="0.42">
+					{/* Rising Sun */}
+					<path
+						d="M500 284C550.81 284 592 242.81 592 192C592 141.19 550.81 100 500 100C449.19 100 408 141.19 408 192C408 242.81 449.19 284 500 284Z"
+						fill={`url(#${uid}-sun)`}
+					/>
+					{/* Horizontal grid lines */}
+					<path
+						d="M82 495H638M96 530H624M116 564H604M144 596H576"
+						stroke="#B342FF"
+						strokeWidth="4"
+					/>
+					{/* Perspective vanishing grid lines */}
+					<path
+						d="M526 638L357 444L222 638M357 444L280 638M357 444L334 638M357 444L392 638M357 444L454 638"
+						stroke="#2FE8FF"
+						strokeWidth="3"
+					/>
+				</g>
+			</g>
 
-        {/* Contact shadow below icon */}
-        <ellipse cx="256" cy="460" rx="165" ry="26" fill={`url(#${uid}-shadow)`} />
+			{/* 3. Luminous Dual-Note Waveform Core */}
+			{/* Beamed cross-bridge */}
+			<path
+				d="M321 230L515 182V410"
+				stroke={`url(#${uid}-note-beam)`}
+				strokeWidth="54"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			{/* Left stem */}
+			<path
+				d="M321 230V455"
+				stroke={`url(#${uid}-note-beam)`}
+				strokeWidth="54"
+				strokeLinecap="round"
+			/>
+			{/* Left note head */}
+			<path
+				d="M289.159 529.966C330.129 516.654 354.764 479.462 344.182 446.897C333.601 414.331 291.811 398.723 250.841 412.034C209.871 425.346 185.236 462.538 195.818 495.103C206.399 527.669 248.189 543.277 289.159 529.966Z"
+				fill={`url(#${uid}-head-left)`}
+			/>
+			{/* Right note head */}
+			<path
+				d="M483.159 484.966C524.129 471.654 548.764 434.462 538.182 401.897C527.601 369.331 485.811 353.723 444.841 367.034C403.871 380.346 379.236 417.538 389.818 450.103C400.399 482.669 442.189 498.277 483.159 484.966Z"
+				fill={`url(#${uid}-head-right)`}
+			/>
+			{/* Note bridge cyan neon core sheen */}
+			<path
+				d="M322 230L514 183"
+				stroke="#B8FBFF"
+				strokeOpacity="0.72"
+				strokeWidth="12"
+				strokeLinecap="round"
+			/>
 
-        {/* ── Outer Shell — Organic Acoustic Silhouette ── */}
-        <path
-          d="M 68 256 C 68 176, 100 130, 140 118 C 158 112, 170 108, 185 115 C 195 120, 202 130, 210 128 C 218 126, 226 112, 236 108 C 246 104, 256 102, 266 106 C 276 110, 284 124, 292 126 C 300 128, 308 120, 318 116 C 330 110, 345 112, 362 120 C 400 136, 444 180, 444 256 C 444 332, 400 376, 362 392 C 345 400, 330 402, 318 396 C 308 392, 300 384, 292 386 C 284 388, 276 402, 266 406 C 256 410, 246 408, 236 404 C 226 400, 218 386, 210 384 C 202 382, 195 392, 185 397 C 170 404, 158 400, 140 394 C 100 382, 68 336, 68 256 Z"
-          fill={`url(#${uid}-shell-body)`}
-        />
+			{/* 4. Lossless Quality Verified Checkmark Badge */}
+			{/* Outer glowing ring */}
+			<path
+				d="M236 589C292.885 589 339 542.885 339 486C339 429.115 292.885 383 236 383C179.115 383 133 429.115 133 486C133 542.885 179.115 589 236 589Z"
+				fill={`url(#${uid}-shield-ring)`}
+				stroke="#16082F"
+				strokeWidth="18"
+			/>
+			{/* Inner badge surface */}
+			<path
+				d="M236 559C276.317 559 309 526.317 309 486C309 445.683 276.317 413 236 413C195.683 413 163 445.683 163 486C163 526.317 195.683 559 236 559Z"
+				fill="#13072D"
+				fillOpacity="0.9"
+			/>
+			{/* Crisp white checkmark */}
+			<path
+				d="M194 486L224 516L282 452"
+				stroke="white"
+				strokeWidth="24"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
 
-        {/* Top surface specular sheen */}
-        <path
-          d="M 68 256 C 68 176, 100 130, 140 118 C 158 112, 170 108, 185 115 C 195 120, 202 130, 210 128 C 218 126, 226 112, 236 108 C 246 104, 256 102, 266 106 C 276 110, 284 124, 292 126 C 300 128, 308 120, 318 116 C 330 110, 345 112, 362 120 C 400 136, 444 180, 444 256 L 68 256 Z"
-          fill={`url(#${uid}-shell-spec)`}
-        />
+			{/* 5. Cyber Sparkle Accents */}
+			<circle cx="548" cy="342" r="9" fill="#00F5FF" />
+			<circle cx="575" cy="318" r="6" fill="#FF62C5" />
+		</svg>
+	);
 
-        {/* Left rim catch-light */}
-        <path
-          d="M 68 256 C 68 200, 88 160, 115 138 C 125 130, 135 124, 140 118 C 158 112, 170 108, 185 115 C 195 120, 202 130, 210 128 L 140 256 Z"
-          fill={`url(#${uid}-shell-rim)`}
-          opacity={0.6}
-        />
+	if (interactive) {
+		return (
+			<button
+				type="button"
+				className={cn(
+					"relative inline-flex items-center justify-center shrink-0 select-none bg-transparent border-0 p-0 cursor-pointer",
+					className,
+				)}
+				style={{ width: size, height: size }}
+				onClick={onClick}
+				title={title}
+				aria-label={title}
+			>
+				<ShapeMedia
+					className="bg-m3-primary-container"
+					width={size}
+					height={size}
+					shape="cookie4Sided"
+					morphOn="click"
+					morphTo="cookie12Sided"
+				>
+					{svgContent}
+				</ShapeMedia>
+			</button>
+		);
+	}
 
-        {/* ── Recessed Inner Groove ── */}
-        <path
-          d="M 100 256 C 100 196, 124 157, 155 146 C 167 142, 178 141, 190 148 C 200 154, 206 165, 213 164 C 220 163, 229 150, 240 147 C 248 144, 256 143, 264 146 C 272 149, 281 162, 288 163 C 295 164, 302 155, 313 150 C 324 144, 337 143, 350 149 C 380 162, 412 198, 412 256 C 412 314, 380 350, 350 363 C 337 369, 324 368, 313 362 C 302 357, 295 348, 288 349 C 281 350, 272 363, 264 366 C 256 369, 248 368, 240 365 C 229 362, 220 349, 213 348 C 206 347, 200 358, 190 364 C 178 371, 167 370, 155 366 C 124 355, 100 316, 100 256 Z"
-          fill={`url(#${uid}-groove)`}
-        />
-
-        {/* Groove ambient neon glow */}
-        <path
-          d="M 108 256 C 108 200, 130 163, 158 152 C 169 148, 179 148, 191 154 C 200 159, 206 168, 213 167 C 220 166, 229 154, 240 151 C 248 148, 256 147, 264 150 C 272 153, 281 165, 288 166 C 295 167, 303 158, 314 153 C 325 148, 337 148, 349 154 C 377 166, 404 200, 404 256 C 404 312, 377 346, 349 358 C 337 364, 325 364, 314 359 C 303 354, 295 345, 288 346 C 281 347, 272 359, 264 362 C 256 365, 248 364, 240 361 C 229 358, 220 346, 213 345 C 206 344, 200 353, 191 358 C 179 364, 169 364, 158 360 C 130 349, 108 312, 108 256 Z"
-          fill={`url(#${uid}-groove-glow)`}
-        />
-
-        {/* ── Neon Luminous Waveform Tube ── */}
-        {/* Wide diffuse glow halo */}
-        <path
-          d="M 116 256 C 150 166, 196 166, 222 256 C 248 346, 294 346, 328 256 C 352 196, 380 196, 396 256"
-          fill="none"
-          stroke={`url(#${uid}-neon-glow)`}
-          strokeWidth="52"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          opacity={0.28}
-          clipPath={`url(#${uid}-clip)`}
-        />
-        {/* Medium bloom */}
-        <path
-          d="M 116 256 C 150 166, 196 166, 222 256 C 248 346, 294 346, 328 256 C 352 196, 380 196, 396 256"
-          fill="none"
-          stroke={`url(#${uid}-neon-glow)`}
-          strokeWidth="32"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          opacity={0.45}
-          clipPath={`url(#${uid}-clip)`}
-        />
-        {/* Core tube */}
-        <path
-          d="M 116 256 C 150 166, 196 166, 222 256 C 248 346, 294 346, 328 256 C 352 196, 380 196, 396 256"
-          fill="none"
-          stroke={`url(#${uid}-neon-core)`}
-          strokeWidth="18"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          clipPath={`url(#${uid}-clip)`}
-        />
-        {/* Specular highlight on tube surface */}
-        <path
-          d="M 116 256 C 150 166, 196 166, 222 256 C 248 346, 294 346, 328 256 C 352 196, 380 196, 396 256"
-          fill="none"
-          stroke={`url(#${uid}-neon-hl)`}
-          strokeWidth="6"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          opacity={0.75}
-          clipPath={`url(#${uid}-clip)`}
-        />
-
-        {/* ── Surface Micro-detail — Ridge catch-light lines ── */}
-        <path
-          d="M 150 136 C 170 122, 185 118, 200 122 C 210 125, 218 132, 228 130 C 238 128, 246 116, 256 114 C 266 112, 274 124, 282 128 C 292 132, 306 124, 320 118 C 338 112, 355 116, 370 128"
-          fill="none"
-          stroke="#7A8CA0"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          opacity={0.5}
-        />
-        <path
-          d="M 150 376 C 170 390, 185 394, 200 390 C 210 387, 218 380, 228 382 C 238 384, 246 396, 256 398 C 266 400, 274 388, 282 384 C 292 380, 306 388, 320 394 C 338 400, 355 396, 370 384"
-          fill="none"
-          stroke="#38414F"
-          strokeWidth="2"
-          strokeLinecap="round"
-          opacity={0.4}
-        />
-      </svg>
-    </div>
-  );
+	return (
+		<div
+			className={cn(
+				"relative inline-flex items-center justify-center shrink-0 select-none",
+				className,
+			)}
+			style={{ width: size, height: size }}
+			title={title}
+			role="img"
+			aria-label={title}
+		>
+			<ShapeMedia
+				width={size}
+				height={size}
+				shape="cookie4Sided"
+				morphOn="click"
+				morphTo="cookie12Sided"
+			>
+				{svgContent}
+			</ShapeMedia>
+		</div>
+	);
 }
