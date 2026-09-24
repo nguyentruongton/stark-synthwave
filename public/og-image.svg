@@ -8,13 +8,6 @@
       <stop offset="100%" stop-color="#0F031E" />
     </linearGradient>
 
-    <!-- Synthwave Horizon Grid Mask -->
-    <linearGradient id="og-grid-fade" x1="0%" y1="100%" x2="0%" y2="0%">
-      <stop offset="0%" stop-color="#FF2D78" stop-opacity="0.35" />
-      <stop offset="50%" stop-color="#8B14CC" stop-opacity="0.15" />
-      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
-    </linearGradient>
-
     <!-- Radial Auras -->
     <radialGradient id="og-glow-pink" cx="20%" cy="50%" r="50%">
       <stop offset="0%" stop-color="#FF2D78" stop-opacity="0.35" />
@@ -40,48 +33,55 @@
       <stop offset="100%" stop-color="#00F7FF" />
     </linearGradient>
 
-    <!-- Embedded Icon Gradients — Dark Graphite + Neon Indigo/Cyan -->
-    <linearGradient id="og-icon-shell" x1="30%" y1="0%" x2="70%" y2="100%">
-      <stop offset="0%"   stop-color="#3A4150" />
-      <stop offset="50%"  stop-color="#252B38" />
-      <stop offset="100%" stop-color="#141820" />
+    <!-- Embedded Synthwave Lossless Icon Gradients -->
+    <linearGradient id="og-icon-bg" x1="112" y1="88" x2="608" y2="632" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#12062C" />
+      <stop offset="0.52" stop-color="#231052" />
+      <stop offset="1" stop-color="#09031B" />
     </linearGradient>
 
-    <linearGradient id="og-icon-groove" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%"   stop-color="#080B10" />
-      <stop offset="100%" stop-color="#0D1119" />
+    <mask id="og-icon-mask" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="70" y="58" width="580" height="580">
+      <path d="M510 58H210C132.68 58 70 120.68 70 198V498C70 575.32 132.68 638 210 638H510C587.32 638 650 575.32 650 498V198C650 120.68 587.32 58 510 58Z" fill="white" />
+    </mask>
+
+    <linearGradient id="og-icon-sun" x1="485" y1="122" x2="485" y2="292" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFD15A" />
+      <stop offset="0.45" stop-color="#FF6F91" />
+      <stop offset="1" stop-color="#D83BFF" />
     </linearGradient>
 
-    <linearGradient id="og-icon-neon" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%"   stop-color="#5865F2" />
-      <stop offset="45%"  stop-color="#0EA5E9" />
-      <stop offset="80%"  stop-color="#00DEFF" />
-      <stop offset="100%" stop-color="#38BDF8" />
+    <linearGradient id="og-icon-beam" x1="220" y1="178" x2="544" y2="512" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#00F5FF" />
+      <stop offset="0.42" stop-color="#6C5CFF" />
+      <stop offset="0.73" stop-color="#E43CFF" />
+      <stop offset="1" stop-color="#FF427F" />
     </linearGradient>
 
-    <clipPath id="og-icon-clip">
-      <path d="
-        M 68 256
-        C 68 176, 100 130, 140 118
-        C 158 112, 170 108, 185 115
-        C 195 120, 202 130, 210 128
-        C 218 126, 226 112, 236 108
-        C 246 104, 256 102, 266 106
-        C 276 110, 284 124, 292 126
-        C 300 128, 308 120, 318 116
-        C 330 110, 345 112, 362 120
-        C 400 136, 444 180, 444 256
-        C 444 332, 400 376, 362 392
-        C 345 400, 330 402, 318 396
-        C 308 392, 300 384, 292 386
-        C 284 388, 276 402, 266 406
-        C 256 410, 246 408, 236 404
-        C 226 400, 218 386, 210 384
-        C 202 382, 195 392, 185 397
-        C 170 404, 158 400, 140 394
-        C 100 382, 68 336, 68 256 Z
-      " />
-    </clipPath>
+    <linearGradient id="og-icon-head-left" x1="131.905" y1="207.791" x2="543.259" y2="425.323" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#00F5FF" />
+      <stop offset="0.42" stop-color="#6C5CFF" />
+      <stop offset="0.73" stop-color="#E43CFF" />
+      <stop offset="1" stop-color="#FF427F" />
+    </linearGradient>
+
+    <linearGradient id="og-icon-head-right" x1="155.306" y1="265.538" x2="566.66" y2="483.07" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#00F5FF" />
+      <stop offset="0.42" stop-color="#6C5CFF" />
+      <stop offset="0.73" stop-color="#E43CFF" />
+      <stop offset="1" stop-color="#FF427F" />
+    </linearGradient>
+
+    <linearGradient id="og-icon-shield" x1="170" y1="390" x2="360" y2="584" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#00F5FF" />
+      <stop offset="0.48" stop-color="#7657FF" />
+      <stop offset="1" stop-color="#FF3DA5" />
+    </linearGradient>
+
+    <!-- Icon Soft Drop Shadow -->
+    <filter id="og-icon-shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#000000" flood-opacity="0.65" />
+      <feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#8B14CC" flood-opacity="0.35" />
+    </filter>
   </defs>
 
   <!-- Background Base -->
@@ -113,32 +113,87 @@
     <line x1="600" y1="420" x2="1200" y2="630" stroke="#8B14CC" stroke-width="1" />
   </g>
 
-  <!-- Left: Claymorphic 3D Soundwave Icon (scaled to ~300px at x=100, y=150) -->
-  <g transform="translate(100, 150) scale(0.585)">
-    <!-- Icon contact shadow -->
-    <ellipse cx="256" cy="460" rx="165" ry="26" fill="#000307" opacity="0.5" />
+  <!-- Left: Synthwave Lossless Checker Icon (scaled to ~374px, centered vertically at x=70, y=128) -->
+  <g transform="translate(70, 128) scale(0.52)" filter="url(#og-icon-shadow)">
+    <!-- Base Squircle Background -->
+    <path
+      d="M510 58H210C132.68 58 70 120.68 70 198V498C70 575.32 132.68 638 210 638H510C587.32 638 650 575.32 650 498V198C650 120.68 587.32 58 510 58Z"
+      fill="url(#og-icon-bg)"
+    />
 
-    <!-- Outer Shell — Organic Acoustic Waveform Silhouette -->
-    <path d="M 68 256 C 68 176, 100 130, 140 118 C 158 112, 170 108, 185 115 C 195 120, 202 130, 210 128 C 218 126, 226 112, 236 108 C 246 104, 256 102, 266 106 C 276 110, 284 124, 292 126 C 300 128, 308 120, 318 116 C 330 110, 345 112, 362 120 C 400 136, 444 180, 444 256 C 444 332, 400 376, 362 392 C 345 400, 330 402, 318 396 C 308 392, 300 384, 292 386 C 284 388, 276 402, 266 406 C 256 410, 246 408, 236 404 C 226 400, 218 386, 210 384 C 202 382, 195 392, 185 397 C 170 404, 158 400, 140 394 C 100 382, 68 336, 68 256 Z"
-      fill="url(#og-icon-shell)" />
+    <!-- Masked Horizon Grid & Sun -->
+    <g mask="url(#og-icon-mask)">
+      <g opacity="0.42">
+        <path
+          d="M500 284C550.81 284 592 242.81 592 192C592 141.19 550.81 100 500 100C449.19 100 408 141.19 408 192C408 242.81 449.19 284 500 284Z"
+          fill="url(#og-icon-sun)"
+        />
+        <path
+          d="M82 495H638M96 530H624M116 564H604M144 596H576"
+          stroke="#B342FF"
+          stroke-width="4"
+        />
+        <path
+          d="M526 638L357 444L222 638M357 444L280 638M357 444L334 638M357 444L392 638M357 444L454 638"
+          stroke="#2FE8FF"
+          stroke-width="3"
+        />
+      </g>
+    </g>
 
-    <!-- Top specular sheen -->
-    <path d="M 68 256 C 68 176, 100 130, 140 118 C 158 112, 170 108, 185 115 C 195 120, 202 130, 210 128 C 218 126, 226 112, 236 108 C 246 104, 256 102, 266 106 C 276 110, 284 124, 292 126 C 300 128, 308 120, 318 116 C 330 110, 345 112, 362 120 C 400 136, 444 180, 444 256 L 68 256 Z"
-      fill="#6B7A90" opacity="0.35" />
+    <!-- Beamed Dual Note Waveform -->
+    <path
+      d="M321 230L515 182V410"
+      stroke="url(#og-icon-beam)"
+      stroke-width="54"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M321 230V455"
+      stroke="url(#og-icon-beam)"
+      stroke-width="54"
+      stroke-linecap="round"
+    />
+    <path
+      d="M289.159 529.966C330.129 516.654 354.764 479.462 344.182 446.897C333.601 414.331 291.811 398.723 250.841 412.034C209.871 425.346 185.236 462.538 195.818 495.103C206.399 527.669 248.189 543.277 289.159 529.966Z"
+      fill="url(#og-icon-head-left)"
+    />
+    <path
+      d="M483.159 484.966C524.129 471.654 548.764 434.462 538.182 401.897C527.601 369.331 485.811 353.723 444.841 367.034C403.871 380.346 379.236 417.538 389.818 450.103C400.399 482.669 442.189 498.277 483.159 484.966Z"
+      fill="url(#og-icon-head-right)"
+    />
+    <path
+      d="M322 230L514 183"
+      stroke="#B8FBFF"
+      stroke-opacity="0.72"
+      stroke-width="12"
+      stroke-linecap="round"
+    />
 
-    <!-- Inner Recessed Groove -->
-    <path d="M 100 256 C 100 196, 124 157, 155 146 C 167 142, 178 141, 190 148 C 200 154, 206 165, 213 164 C 220 163, 229 150, 240 147 C 248 144, 256 143, 264 146 C 272 149, 281 162, 288 163 C 295 164, 302 155, 313 150 C 324 144, 337 143, 350 149 C 380 162, 412 198, 412 256 C 412 314, 380 350, 350 363 C 337 369, 324 368, 313 362 C 302 357, 295 348, 288 349 C 281 350, 272 363, 264 366 C 256 369, 248 368, 240 365 C 229 362, 220 349, 213 348 C 206 347, 200 358, 190 364 C 178 371, 167 370, 155 366 C 124 355, 100 316, 100 256 Z"
-      fill="url(#og-icon-groove)" />
+    <!-- Lossless Quality Badge -->
+    <path
+      d="M236 589C292.885 589 339 542.885 339 486C339 429.115 292.885 383 236 383C179.115 383 133 429.115 133 486C133 542.885 179.115 589 236 589Z"
+      fill="url(#og-icon-shield)"
+      stroke="#16082F"
+      stroke-width="18"
+    />
+    <path
+      d="M236 559C276.317 559 309 526.317 309 486C309 445.683 276.317 413 236 413C195.683 413 163 445.683 163 486C163 526.317 195.683 559 236 559Z"
+      fill="#13072D"
+      fill-opacity="0.9"
+    />
+    <path
+      d="M194 486L224 516L282 452"
+      stroke="white"
+      stroke-width="24"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
 
-    <!-- Neon Waveform Tube — wide glow -->
-    <path d="M 116 256 C 150 166, 196 166, 222 256 C 248 346, 294 346, 328 256 C 352 196, 380 196, 396 256"
-      fill="none" stroke="url(#og-icon-neon)" stroke-width="44" stroke-linecap="round" opacity="0.3" clip-path="url(#og-icon-clip)" />
-    <!-- Core tube -->
-    <path d="M 116 256 C 150 166, 196 166, 222 256 C 248 346, 294 346, 328 256 C 352 196, 380 196, 396 256"
-      fill="none" stroke="url(#og-icon-neon)" stroke-width="20" stroke-linecap="round" clip-path="url(#og-icon-clip)" />
-    <!-- Center highlight -->  
-    <path d="M 116 256 C 150 166, 196 166, 222 256 C 248 346, 294 346, 328 256 C 352 196, 380 196, 396 256"
-      fill="none" stroke="#D0F4FF" stroke-width="7" stroke-linecap="round" opacity="0.7" clip-path="url(#og-icon-clip)" />
+    <!-- Sparkles -->
+    <circle cx="548" cy="342" r="9" fill="#00F5FF" />
+    <circle cx="575" cy="318" r="6" fill="#FF62C5" />
   </g>
 
   <!-- Right: Branding & Typography -->
@@ -158,7 +213,7 @@
       Bộ công cụ phân tích &amp; xử lý âm thanh trực tuyến chuẩn xác
     </text>
 
-    <!-- Feature Feature Badges -->
+    <!-- Feature Badges -->
     <g transform="translate(0, 195)">
       <!-- Feature 1: Lossless Checker -->
       <g transform="translate(0, 0)">

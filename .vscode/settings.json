@@ -1,0 +1,14 @@
+{
+	"editor.defaultFormatter": "biomejs.biome",
+	"editor.formatOnSave": true,
+	"editor.codeActionsOnSave": {
+		"source.fixAll.biome": "explicit",
+		"source.organizeImports.biome": "explicit"
+	},
+	"terminal.integrated.suggest.enabled": true,
+	"terminal.integrated.shellIntegration.enabled": true,
+	"css.lint.unknownAtRules": "ignore",
+	"[jsonc]": {
+		"editor.defaultFormatter": "vscode.json-language-features"
+	}
+}

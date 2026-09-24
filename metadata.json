@@ -1,6 +1,0 @@
-{
-  "name": "Stark Synthwave",
-  "description": "Cắt ghép nhạc với bộ hiển thị phổ tần số thời gian thực Web Audio API, kiểm tra chất lượng lossless thật/giả, đo tempo BPM và dò tone thang âm bài hát hoàn toàn trên client.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
